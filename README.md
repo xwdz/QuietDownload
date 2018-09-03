@@ -1,5 +1,7 @@
 ### QuiteDownload
 
+#### 长期维护,勿fork,请star。
+ 
 ### 功能
 
   - 任何一个界面检测进度
@@ -24,8 +26,10 @@
 
 #### 添加依赖
 
+$lastVersion = [![](https://jitpack.io/v/xwdz/QuietDownload.svg)](https://jitpack.io/#xwdz/QuietDownload)
+
 ```
-compile 'com.xwdz:downloader:0.0.1'
+compile 'com.xwdz:downloader:$lastVersion'
 ```
 
 在AndroidManifest.xml 声明如下service
@@ -175,6 +179,8 @@ mDownloader.setHandlerNetworkListener(new QuiteDownload.DispatcherNetwork() {
     }
     
 ```
+
+
 
 
 

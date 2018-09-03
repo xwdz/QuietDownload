@@ -44,7 +44,7 @@ publish {
     userOrg = 'quinnhuang'//bintray.com的用户名
     repoName = 'xw-widget'//远程仓库名字,不指明，默认是上传到maven
     groupId = 'com.xwdz'//jcenter上的路径
-    artifactId = 'QuietDownloader'//项目名称
+    artifactId = 'QuietDownload'//项目名称
     publishVersion = '0.0.1'//版本号
     desc = '下载器'//描述，不重要
     website = siteUrl//项目主页

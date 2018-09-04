@@ -17,24 +17,42 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               xmlns:tools="http://schemas.android.com/tools"
               android:layout_width="match_parent"
-              android:layout_height="match_parent">
+              android:layout_height="wrap_content"
+              android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/downloadLabel"
-        android:layout_width="0dp"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
-        android:layout_weight="1"/>
+        android:orientation="horizontal">
 
-    <Button
-        android:id="@+id/downloadBtn"
-        android:layout_width="60dp"
-        android:layout_height="wrap_content"
-        android:text="开始"/>
+        <TextView
+            android:id="@+id/downloadLabel"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"/>
 
-    <Button
-        android:id="@+id/pause"
-        android:layout_width="60dp"
-        android:layout_height="wrap_content"
-        android:text="暂停"/>
+        <Button
+            android:id="@+id/downloadBtn"
+            android:layout_width="60dp"
+            android:layout_height="wrap_content"
+            android:text="开始"/>
+
+        <Button
+            android:id="@+id/pause"
+            android:layout_width="60dp"
+            android:layout_height="wrap_content"
+            android:text="暂停"/>
+
+    </LinearLayout>
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_marginTop="10dp"
+        android:layout_height="20dp"
+        android:max="100"/>
+
+
 </LinearLayout>

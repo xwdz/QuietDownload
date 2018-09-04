@@ -25,6 +25,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.xwdz.download.core.QuietDownloader;
@@ -120,16 +121,21 @@ public class ListActivity extends AppCompatActivity {
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             if (convertView == null || convertView.getTag() == null) {
-                convertView = LayoutInflater.from(ListActivity.this).inflate(R.layout.activity_list_item, null);
+                convertView = LayoutInflater.from(ListActivity.this).inflate(R.layout.activity_list_item, parent,false);
                 holder = new ViewHolder();
                 holder.mDownloadBtn = (Button) convertView.findViewById(R.id.downloadBtn);
                 holder.mDownloadLabel = (TextView) convertView.findViewById(R.id.downloadLabel);
                 holder.mPause = convertView.findViewById(R.id.pause);
+                holder.mProgressBar = convertView.findViewById(R.id.progressBar);
                 convertView.setTag(holder);
             } else {
                 holder = (ViewHolder) convertView.getTag();
             }
             final DownloadEntry entry = mDownloadEntries.get(position);
+            float length = entry.currentLength * 1.0f / entry.totalLength;
+            int percent = (int) (length * 100);
+            holder.mProgressBar.setProgress(percent);
+
             holder.mDownloadLabel.setText(entry.name + " is " + entry.status + " "
                     + Formatter.formatShortFileSize(getApplicationContext(), entry.currentLength)
                     + "/" + Formatter.formatShortFileSize(getApplicationContext(), entry.totalLength));
@@ -140,10 +146,6 @@ public class ListActivity extends AppCompatActivity {
                             || entry.status == DownloadEntry.DownloadStatus.paused) {
                         mQuietDownloader.download(entry);
                     }
-                    AppEntry appEntry = new AppEntry();
-                    appEntry.name = entry.name;
-                    appEntry.url = entry.url;
-                    AppDetailActivity.start(ListActivity.this, appEntry);
                 }
             });
 
@@ -173,6 +175,7 @@ public class ListActivity extends AppCompatActivity {
         TextView mDownloadLabel;
         Button mDownloadBtn;
         Button mPause;
+        ProgressBar mProgressBar;
 
     }
 }

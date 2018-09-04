@@ -28,10 +28,21 @@
 
 #### 添加依赖
 
+根项目的build.gradle：
+
+```
+allprojects {
+    repositories {
+        jcenter()
+			maven { url "https://jitpack.io" }
+    }
+}
+```
+
 $lastVersion = [![](https://jitpack.io/v/xwdz/QuietDownload.svg)](https://jitpack.io/#xwdz/QuietDownload)
 
 ```
-compile 'com.xwdz:downloader:$lastVersion'
+implementation 'com.xwdz:QuietDownloader:$lastVersion'
 ```
 
 在AndroidManifest.xml 声明如下service

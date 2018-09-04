@@ -24,7 +24,7 @@ import android.os.IBinder;
 import android.os.Message;
 import android.util.ArrayMap;
 
-import com.xwdz.download.DownloadConfig;
+import com.xwdz.download.QuietConfig;
 import com.xwdz.download.db.DBController;
 import com.xwdz.download.db.DownloadEntry;
 import com.xwdz.download.utils.Constants;
@@ -103,8 +103,7 @@ public class DownloadService extends Service {
         if (downloadEntrys != null) {
             for (DownloadEntry downloadEntry : downloadEntrys) {
                 if (downloadEntry.status == DownloadEntry.DownloadStatus.downloading || downloadEntry.status == DownloadEntry.DownloadStatus.waiting) {
-//                    TODO startDownload a config if need to recover startDownload
-                    if (DownloadConfig.getConfig().isRecoverDownloadWhenStart()) {
+                    if (QuietConfig.getImpl().isRecoverDownloadWhenStart()) {
                         if (downloadEntry.isSupportRange) {
                             downloadEntry.status = DownloadEntry.DownloadStatus.paused;
                         } else {
@@ -197,7 +196,7 @@ public class DownloadService extends Service {
     }
 
     private void addDownload(DownloadEntry downloadEntry) {
-        if (mDownloadingTasks.size() >= DownloadConfig.getConfig().getMaxDownloadTasks()) {
+        if (mDownloadingTasks.size() >= QuietConfig.getImpl().getMaxDownloadTasks()) {
             mWaitingQueue.offer(downloadEntry);
             downloadEntry.status = DownloadEntry.DownloadStatus.waiting;
             mDataChanger.postStatus(downloadEntry);
@@ -233,8 +232,30 @@ public class DownloadService extends Service {
     }
 
     private void startDownload(DownloadEntry downloadEntry) {
+        boolean handler = checkIsHandlerNetwork();
+        if (handler){
+            return;
+        }
+
         DownloadTaskManager task = new DownloadTaskManager(downloadEntry, mHandler, mExecutors);
         task.start();
         mDownloadingTasks.put(downloadEntry.id, task);
+    }
+
+    /**
+     * @return 检查是否处理网络情况
+     */
+    private boolean checkIsHandlerNetwork() {
+        QuietConfig.HandlerNetwork mHandlerNetwork = QuietConfig.getImpl().getHandlerNetwork();
+        boolean handlerNetwork = false;
+        if (mHandlerNetwork != null) {
+            handlerNetwork = mHandlerNetwork.onHandlerNetworkStatus();
+        }
+
+        if (handlerNetwork) {
+            Logger.d(TAG, "handler network,end.");
+            return true;
+        }
+        return false;
     }
 }

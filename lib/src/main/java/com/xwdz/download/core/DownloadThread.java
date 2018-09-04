@@ -65,7 +65,7 @@ public class DownloadThread implements Runnable {
     public void run() {
         //todo not impl retry
         realRun();
-//        final int retryCount = DownloadConfig.getConfig().getMaxRetryCount();
+//        final int retryCount = QuietConfig.getConfig().getMaxRetryCount();
 //        for (int i = 0; i < retryCount; i++) {
 //            if (mRetryCountIndex == retryCount && !isError) {
 //                Logger.d(TAG, "current retryCount:" + mRetryCountIndex + " setRetryCount:" + retryCount);

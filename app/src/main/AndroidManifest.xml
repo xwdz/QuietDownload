@@ -16,6 +16,11 @@
         android:name=".App"
         android:theme="@style/AppTheme">
         <activity android:name=".MainActivity">
+        </activity>
+
+        <service android:name="com.xwdz.download.core.DownloadService"/>
+        <activity android:name=".ListActivity" >
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
@@ -23,7 +28,7 @@
             </intent-filter>
         </activity>
 
-        <service android:name="com.xwdz.download.core.DownloadService"/>
+        <activity android:name=".AppDetailActivity" />
 
     </application>
 

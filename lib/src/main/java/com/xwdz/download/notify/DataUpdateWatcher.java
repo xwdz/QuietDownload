@@ -25,7 +25,7 @@ import java.util.Observer;
 /**
  * this class receiver data changed
  */
-public abstract class DataUpdateReceiver implements Observer {
+public abstract class DataUpdateWatcher implements Observer {
     @Override
     public void update(Observable observable, Object data) {
         if (data instanceof DownloadEntry) {

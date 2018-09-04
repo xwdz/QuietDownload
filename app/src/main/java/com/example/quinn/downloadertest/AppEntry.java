@@ -14,33 +14,30 @@
  *    limitations under the License.
  */
 
-package com.xwdz.download.utils;
+package com.example.quinn.downloadertest;
 
-import android.util.Log;
 
-import com.xwdz.download.QuietConfig;
+import com.xwdz.download.db.DownloadEntry;
 
-/**
- * @author xwdz(xwdz9989@gmail.com)
- */
-public class Logger {
+import java.io.Serializable;
 
-    public static final String TAG = "xwdz_downloader";
-    private static final boolean DEBUG = QuietConfig.getImpl().isDebug;
+public class AppEntry implements Serializable{
+    public String name;
+    public String icon;
+    public String size;
+    public String desc;
+    public String url;
 
-    public static void d(String msg) {
-        if (DEBUG)
-            Log.d(TAG, msg);
+    @Override
+    public String toString() {
+        return name + "-----" + desc + "-----" + url;
     }
 
-    public static void d(String tag, String msg) {
-        if (DEBUG)
-            Log.d(TAG, "[" + tag + "] " + msg);
-    }
-
-
-    public static void e(String tag, String msg) {
-        if (DEBUG)
-            Log.e(TAG, "[" + tag + "] " + msg);
+    public DownloadEntry generateDownloadEntry() {
+        DownloadEntry entry = new DownloadEntry();
+        entry.id = url;
+        entry.name = name;
+        entry.url = url;
+        return entry;
     }
 }

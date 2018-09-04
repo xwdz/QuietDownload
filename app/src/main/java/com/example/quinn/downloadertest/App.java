@@ -18,7 +18,8 @@ package com.example.quinn.downloadertest;
 
 import android.app.Application;
 
-import com.xwdz.download.core.QuiteDownload;
+import com.xwdz.download.QuietConfig;
+import com.xwdz.download.core.QuietDownloader;
 
 /**
  * @author 黄兴伟 (xwd9989@gamil.com)
@@ -26,10 +27,23 @@ import com.xwdz.download.core.QuiteDownload;
  */
 public class App extends Application {
 
+
+
     @Override
     public void onCreate() {
         super.onCreate();
-        QuiteDownload.getImpl().bindService(this);
 
+        QuietDownloader.getImpl().bindService(this);
+
+        QuietConfig.getImpl()
+                .initDownloadFile(this)
+                .setMaxDownloadTasks(5)
+                .setRecoverDownloadWhenStart(true)
+                .setHandlerNetworkListener(new QuietConfig.HandlerNetwork() {
+            @Override
+            public boolean onHandlerNetworkStatus() {
+                return false;
+            }
+        });
     }
 }

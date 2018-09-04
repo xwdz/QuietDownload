@@ -99,7 +99,7 @@ class DataChanger extends Observable {
 
     private static void checkContext(Context context) {
         if (context == null) {
-            throw new NullPointerException("not initContext,please call intContext()");
+            throw new NullPointerException("not initDownloadFile,please call intContext()");
         }
     }
 }

@@ -19,9 +19,9 @@ package com.xwdz.download.core;
 import android.content.Context;
 import android.content.Intent;
 
-import com.xwdz.download.DownloadConfig;
+import com.xwdz.download.QuietConfig;
 import com.xwdz.download.db.DownloadEntry;
-import com.xwdz.download.notify.DataUpdateReceiver;
+import com.xwdz.download.notify.DataUpdateWatcher;
 import com.xwdz.download.utils.Constants;
 import com.xwdz.download.utils.Logger;
 
@@ -30,28 +30,25 @@ import java.io.File;
 /**
  * @author xwdz(xwdz9989@gmail.com)
  */
-public class QuiteDownload {
+public class QuietDownloader {
 
 
     private static class Holder {
-        private static final QuiteDownload INSTANCE = new QuiteDownload();
+        private static final QuietDownloader INSTANCE = new QuietDownloader();
     }
 
-    public static QuiteDownload getImpl() {
+    public static QuietDownloader getImpl() {
         return Holder.INSTANCE;
     }
 
-    private static final String TAG = QuiteDownload.class.getSimpleName();
+    private static final String TAG = QuietDownloader.class.getSimpleName();
     private static boolean mInit;
 
     private Context mContext;
     private long mLastOperatedTime = 0;
     private DataChanger mDataChanger;
 
-    private HandlerNetwork mHandlerNetwork;
-
-
-    private QuiteDownload() {
+    private QuietDownloader() {
         mDataChanger = DataChanger.getImpl();
     }
 
@@ -63,24 +60,10 @@ public class QuiteDownload {
     }
 
     /**
-     * @see HandlerNetwork 处理网络情况
-     * @param handlerNetworkListener
-     */
-    public void setHandlerNetworkListener(HandlerNetwork handlerNetworkListener) {
-        this.mHandlerNetwork = handlerNetworkListener;
-    }
-
-
-    /**
      * 开始下载一个任务
-     * @param downloadEntry
      */
-    public void startDownload(DownloadEntry downloadEntry) {
+    public void download(DownloadEntry downloadEntry) {
         if (!checkIfExecutable()) {
-            return;
-        }
-
-        if (checkIsHandlerNetwork()){
             return;
         }
 
@@ -91,27 +74,11 @@ public class QuiteDownload {
     }
 
     /**
-     * @return 检查是否处理网络情况
-     */
-    private boolean checkIsHandlerNetwork(){
-        boolean handlerNetwork = false;
-        if (mHandlerNetwork != null) {
-            handlerNetwork = mHandlerNetwork.onHandlerNetworkStatus();
-        }
-
-        if (handlerNetwork){
-            Logger.d(TAG,"handler network,end.");
-            return true;
-        }
-        return false;
-    }
-
-    /**
      * @return 检查事件间隔时间
      */
     private boolean checkIfExecutable() {
         long tmp = System.currentTimeMillis();
-        boolean isMinTimeInterval = tmp - mLastOperatedTime > DownloadConfig.getConfig().getMinOperateInterval();
+        boolean isMinTimeInterval = tmp - mLastOperatedTime > QuietConfig.getImpl().getMinOperateInterval();
         if (isMinTimeInterval && mInit) {
             mLastOperatedTime = tmp;
             return true;
@@ -123,7 +90,6 @@ public class QuiteDownload {
 
     /**
      * 暂停一个任务
-     * @param downloadEntry
      */
     public void pause(DownloadEntry downloadEntry) {
         if (!checkIfExecutable()) {
@@ -137,14 +103,9 @@ public class QuiteDownload {
 
     /**
      *  恢复一个任务
-     * @param downloadEntry
      */
     public void resume(DownloadEntry downloadEntry) {
         if (!checkIfExecutable()) {
-            return;
-        }
-
-        if (checkIsHandlerNetwork()){
             return;
         }
 
@@ -156,7 +117,6 @@ public class QuiteDownload {
 
     /**
      * 取消一个任务
-     * @param downloadEntry
      */
     public void cancel(DownloadEntry downloadEntry) {
         if (!checkIfExecutable()) {
@@ -188,10 +148,6 @@ public class QuiteDownload {
             return;
         }
 
-        if (checkIsHandlerNetwork()){
-            return;
-        }
-
         Intent intent = new Intent(mContext, DownloadService.class);
         intent.putExtra(Constants.KEY_DOWNLOAD_ACTION, Constants.KEY_DOWNLOAD_ACTION_RECOVER_ALL);
         mContext.startService(intent);
@@ -199,26 +155,23 @@ public class QuiteDownload {
 
     /**
      * 添加一个数据接收器
-     * @see DataUpdateReceiver
-     * @param watcher
+     * @see DataUpdateWatcher
      */
-    public void addObserver(DataUpdateReceiver watcher) {
+    public void addObserver(DataUpdateWatcher watcher) {
         mDataChanger.addObserver(watcher);
     }
 
     /**
      * 删除一个数据接收器
-     * @see DataUpdateReceiver
-     * @param watcher
+     * @see DataUpdateWatcher
      */
-    public void removeObserver(DataUpdateReceiver watcher) {
+    public void removeObserver(DataUpdateWatcher watcher) {
         mDataChanger.deleteObserver(watcher);
     }
 
     /**
      * 查询一个任务从数据库中
      * @param id by DownloadEntry
-     * @return
      */
     public DownloadEntry queryDownloadEntry(String id) {
         return mDataChanger.queryDownloadEntryById(id);
@@ -236,21 +189,10 @@ public class QuiteDownload {
     public void deleteDownloadEntry(boolean forceDelete, String id) {
         mDataChanger.deleteDownloadEntry(id);
         if (forceDelete) {
-            File file = DownloadConfig.getConfig().getDownloadFile(id);
+            File file = QuietConfig.getImpl().getDownloadFile(id);
             if (file.exists())
                 file.delete();
         }
 
     }
-
-
-    public interface HandlerNetwork {
-        /**
-         * 处理网络状况接口
-         * @return true:  消费该事件终止运行下载任务
-         *         false: 正常执行下载任务
-         */
-        boolean onHandlerNetworkStatus();
-    }
-
 }

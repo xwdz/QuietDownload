@@ -20,7 +20,7 @@ import android.os.Handler;
 import android.os.Message;
 
 
-import com.xwdz.download.DownloadConfig;
+import com.xwdz.download.QuietConfig;
 import com.xwdz.download.db.DownloadEntry;
 import com.xwdz.download.utils.TickTack;
 import com.xwdz.download.utils.Logger;
@@ -53,11 +53,11 @@ public class DownloadTaskManager implements ConnectThread.ConnectListener, Downl
         this.mDownloadEntry = downloadEntry;
         this.mHandler = mHandler;
         this.mExecutor = mExecutor;
-        this.destFile = DownloadConfig.getConfig().getDownloadFile(downloadEntry.url);
+        this.destFile = QuietConfig.getImpl().getDownloadFile(downloadEntry.url);
     }
 
     public void pause() {
-        Logger.e(TAG, "startDownload paused");
+        Logger.e(TAG, "download paused");
         isPaused = true;
         //todo  connect Thread cancel...
 //        if (mConnectThread != null && mConnectThread.isRunning()) {
@@ -77,7 +77,7 @@ public class DownloadTaskManager implements ConnectThread.ConnectListener, Downl
     }
 
     public void cancel() {
-        Logger.e(TAG, "startDownload cancelled");
+        Logger.e(TAG, "download cancelled");
         isCancelled = true;
         //todo  connect Thread cancel...
 
@@ -103,7 +103,7 @@ public class DownloadTaskManager implements ConnectThread.ConnectListener, Downl
     }
 
     private void startDownload() {
-        Logger.e(TAG, "startDownload: isSupportRange-" + mDownloadEntry.isSupportRange);
+        Logger.e(TAG, "download: isSupportRange-" + mDownloadEntry.isSupportRange);
         if (mDownloadEntry.isSupportRange) {
             startMultiDownload();
         } else {
@@ -115,20 +115,20 @@ public class DownloadTaskManager implements ConnectThread.ConnectListener, Downl
         Logger.e(TAG, "startMultiDownload");
         mDownloadEntry.status = (DownloadEntry.DownloadStatus.downloading);
         notifyUpdate(mDownloadEntry, DownloadService.NOTIFY_DOWNLOADING);
-        int block = mDownloadEntry.totalLength / DownloadConfig.getConfig().getMaxDownloadThreads();
+        int block = mDownloadEntry.totalLength / QuietConfig.getImpl().getMaxDownloadThreads();
         int startPos = 0;
         int endPos = 0;
         if (mDownloadEntry.ranges == null) {
             mDownloadEntry.ranges = new HashMap<>();
-            for (int i = 0; i < DownloadConfig.getConfig().getMaxDownloadThreads(); i++) {
+            for (int i = 0; i < QuietConfig.getImpl().getMaxDownloadThreads(); i++) {
                 mDownloadEntry.ranges.put(i, 0);
             }
         }
-        mDownloadThreads = new DownloadThread[DownloadConfig.getConfig().getMaxDownloadThreads()];
-        mDownloadStatus = new DownloadEntry.DownloadStatus[DownloadConfig.getConfig().getMaxDownloadThreads()];
-        for (int i = 0; i < DownloadConfig.getConfig().getMaxDownloadThreads(); i++) {
+        mDownloadThreads = new DownloadThread[QuietConfig.getImpl().getMaxDownloadThreads()];
+        mDownloadStatus = new DownloadEntry.DownloadStatus[QuietConfig.getImpl().getMaxDownloadThreads()];
+        for (int i = 0; i < QuietConfig.getImpl().getMaxDownloadThreads(); i++) {
             startPos = i * block + mDownloadEntry.ranges.get(i);
-            if (i == DownloadConfig.getConfig().getMaxDownloadThreads() - 1) {
+            if (i == QuietConfig.getImpl().getMaxDownloadThreads() - 1) {
                 endPos = mDownloadEntry.totalLength - 1;
             } else {
                 endPos = (i + 1) * block - 1;
@@ -235,7 +235,7 @@ public class DownloadTaskManager implements ConnectThread.ConnectListener, Downl
         Logger.e(TAG, "onDownloadError:" + message);
         mDownloadStatus[index] = DownloadEntry.DownloadStatus.error;
 
-//        TODO startDownload retry operation
+//        TODO download retry operation
         for (int i = 0; i < mDownloadStatus.length; i++) {
             if (mDownloadStatus[i] != DownloadEntry.DownloadStatus.completed && mDownloadStatus[i] != DownloadEntry.DownloadStatus.error) {
                 mDownloadThreads[i].cancelByError();

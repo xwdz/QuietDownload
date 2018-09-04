@@ -1,7 +1,9 @@
 ### QuiteDownload
 
-#### 长期维护,勿fork,请star。
- 
+> 如果你觉得这个lib对你有用,随手给个Star,让我知道它是对你有帮助的,我会继续更新和维护它。
+
+![image.png](https://upload-images.jianshu.io/upload_images/2651056-fb06d3eb9120c2d9.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
 ### 功能
 
   - 任何一个界面检测进度
@@ -10,7 +12,7 @@
   - 取消单个任务
   - 取消全部任务
   - 暂停所有任务
-  - 最大同时下载任务数
+  - 队列最大同时下载任务数,超过则进入等待队列
   - 自动恢复上一次下载任务
  
 
@@ -44,38 +46,54 @@ compile 'com.xwdz:downloader:$lastVersion'
        XDownloaderManager.getImpl().bindService(this);
        
     2. 添加一些列配置
-        DownloadConfig.getConfig()
+        QuietConfig.getImpl()
+                        // 默认下载路径为[sdcard/Download/包名/xxx.apk]
+                        // 若没有自定义下载文件路径,则必须调用该init代码
+                        .initDownloadFile(context)
                         //debug模式
                         .setDebug(boolean isDebug)
                         //下载文件路径
                         .setDownloadDir(File file)
-                        // 最大同时下载任务数
+                        // 队列最大同时下载任务数,超过则进入等待队列 默认:3
                         .setMaxDownloadTasks(int)
-                        // 最大线程下载数
+                        // 最大线程下载数   默认:3
                         .setMaxDownloadThreads(int)
                         // 间隔毫秒
                         .setMinOperateInterval(long)
-                        // 自动恢复下载
+                        // 打开界面自动恢复下载
                         .setRecoverDownloadWhenStart(false);
+                        
+    QuietDownloadConfig还提供了一处全局处理网络的接口:
+    
+    public interface HandlerNetwork {
+                  /**
+                   * 处理网络状况接口
+                   * @return true:  消费该事件终止运行下载任务
+                   *         false: 正常执行下载任务
+                   */
+                  boolean onHandlerNetworkStatus();
+              }
+    QuietConfig.getImpl().setHandlerNetworkListener(new QuietDownloadConfig.HandlerNetwork() {
+         @Override
+         public boolean onHandlerNetworkStatus() {
+             // 自己的逻辑判断，提示当前不在wifi情况dialog 等
+             return false;
+         }
+     });
+                        
                         
                         
 #### 关于DownloadEntry
 
 ```
-public class DownloadEntry implements Serializable, Cloneable {
+public class DownloadEntry implements Serializable {
 
     public String id;
     public String name;
     public String url;
     public int currentLength;
     public int totalLength;
-    public DownloadStatus status = DownloadStatus.idle;
-    public boolean isSupportRange = false;
-    public HashMap<Integer, Integer> ranges;
-
-    public DownloadEntry() {
-
-    }
+        // ... 省略代码
 
     public DownloadEntry(String url) {
         this.url = url;
@@ -83,13 +101,6 @@ public class DownloadEntry implements Serializable, Cloneable {
         this.name = url.substring(url.lastIndexOf("/") + 1);
     }
 
-    public void reset() {
-        currentLength = 0;
-        ranges = null;
-        File file = DownloadConfig.getConfig().getDownloadFile(url);
-        if (file.exists()) {
-            file.delete();
-        }
     }
     // ... 省略代码
 }
@@ -130,33 +141,12 @@ private final DownloadEntry downloadEntry = new DownloadEntry("url");
   
 ```
 
-#### 一些接口
-
-```
- public interface HandlerNetwork {
-        /**
-         * 处理网络状况接口
-         * @return true:  消费该事件终止运行下载任务
-         *         false: 正常执行下载任务
-         */
-        boolean onHandlerNetworkStatus();
-    }
-    
-    
-mDownloader.setHandlerNetworkListener(new QuiteDownload.DispatcherNetwork() {
-            @Override
-            public boolean onHandlerNetworkStatus() {
-                return false;
-            }
-        });
-```
-
 #### 关于监听
 
 `QuiteDownload` 并没有采用传统listener方式，而是使用了观察者模式,如需要在某个界面监听下载进度
 
 ```
-    private final DataUpdateReceiver mDataUpdateReceiver = new DataUpdateReceiver() {
+    private final DataUpdateWatcher mDataUpdateReceiver = new DataUpdateWatcher() {
         @Override
         public void notifyUpdate(DownloadEntry data) {
             // calback mainUIThread 
@@ -181,6 +171,8 @@ mDownloader.setHandlerNetworkListener(new QuiteDownload.DispatcherNetwork() {
 ```
 
 
+### TODO
+ - 重试机制
 
 
 

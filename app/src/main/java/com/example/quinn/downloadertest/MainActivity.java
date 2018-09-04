@@ -6,13 +6,12 @@ import android.text.format.Formatter;
 import android.view.View;
 import android.widget.TextView;
 
-import com.xwdz.download.core.QuiteDownload;
+import com.xwdz.download.core.QuietDownloader;
 import com.xwdz.download.db.DownloadEntry;
-import com.xwdz.download.notify.DataUpdateReceiver;
+import com.xwdz.download.notify.DataUpdateWatcher;
 
 public class MainActivity extends AppCompatActivity {
 
-    private TestViewModel mTestViewModel = new TestViewModel();
 
     private static final String URL = "http://shouji.360tpcdn.com/150723/de6fd89a346e304f66535b6d97907563/com.sina.weibo_2057.apk";
     private static final String URL2 = "https://dldir1.qq.com/weixin/android/weixin672android1340.apk";
@@ -22,7 +21,7 @@ public class MainActivity extends AppCompatActivity {
     private DownloadEntry mDownloadEntry;
 
 
-    private final DataUpdateReceiver mDataUpdateReceiver = new DataUpdateReceiver() {
+    private final DataUpdateWatcher mDataUpdateWatcher = new DataUpdateWatcher() {
         @Override
         public void notifyUpdate(DownloadEntry data) {
             initializeData(data);
@@ -30,7 +29,7 @@ public class MainActivity extends AppCompatActivity {
     };
 
 
-    private QuiteDownload mDownloader = QuiteDownload.getImpl();
+    private QuietDownloader mDownloader = QuietDownloader.getImpl();
 
     private void initializeData(DownloadEntry entry) {
         if (entry.url.equals(URL)) {
@@ -64,33 +63,24 @@ public class MainActivity extends AppCompatActivity {
 
         mDownloadEntry = new DownloadEntry(URL);
 
-
-        mDownloader.setHandlerNetworkListener(new QuiteDownload.HandlerNetwork() {
-            @Override
-            public boolean onHandlerNetworkStatus() {
-
-                return false;
-            }
-        });
         mTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mDownloader.startDownload(mDownloadEntry);
+                mDownloader.download(mDownloadEntry);
             }
         });
-
 
         mTextView2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mDownloader.startDownload(new DownloadEntry(URL2));
+                mDownloader.download(new DownloadEntry(URL2));
             }
         });
 
         mTextView3.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mDownloader.startDownload(new DownloadEntry(URL3));
+                mDownloader.download(new DownloadEntry(URL3));
             }
         });
     }
@@ -99,12 +89,12 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        mDownloader.addObserver(mDataUpdateReceiver);
+        mDownloader.addObserver(mDataUpdateWatcher);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        mDownloader.removeObserver(mDataUpdateReceiver);
+        mDownloader.removeObserver(mDataUpdateWatcher);
     }
 }

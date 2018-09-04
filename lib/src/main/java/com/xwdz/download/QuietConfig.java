@@ -16,8 +16,8 @@
 
 package com.xwdz.download;
 
+import android.content.Context;
 import android.os.Environment;
-
 
 import com.xwdz.download.utils.FileUtils;
 
@@ -26,11 +26,9 @@ import java.io.File;
 /**
  * @author xwdz(xwdz9989@gmail.com)
  */
-public class DownloadConfig {
+public class QuietConfig {
 
-    public  static boolean isDebug = true;
-
-    private static DownloadConfig mConfig;
+    public boolean isDebug = true;
 
     private int mMaxDownloadTasks = 3;
     private int mMaxDownloadThreads = 3;
@@ -42,22 +40,30 @@ public class DownloadConfig {
     //  FIXME: no implement
     private int mMaxRetryCount = 2;
 
-    private DownloadConfig() {
-        mDownloadDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+    private QuietConfig() {
     }
 
-    public synchronized static DownloadConfig getConfig() {
-        if (mConfig == null) {
-            mConfig = new DownloadConfig();
+    private static class HolderClass {
+        private static final QuietConfig INSTANCE = new QuietConfig();
+    }
+
+    public synchronized static QuietConfig getImpl() {
+        return HolderClass.INSTANCE;
+    }
+
+    public QuietConfig initDownloadFile(Context context) {
+        mDownloadDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath() + File.separator + context.getPackageName());
+        if (!mDownloadDir.exists()) {
+            mDownloadDir.mkdir();
         }
-        return mConfig;
+        return this;
     }
 
     public int getMaxDownloadTasks() {
         return mMaxDownloadTasks;
     }
 
-    public DownloadConfig setMaxDownloadTasks(int maxDownloadTasks) {
+    public QuietConfig setMaxDownloadTasks(int maxDownloadTasks) {
         this.mMaxDownloadTasks = maxDownloadTasks;
         return this;
     }
@@ -66,7 +72,7 @@ public class DownloadConfig {
         return mMaxDownloadThreads;
     }
 
-    public DownloadConfig setMaxDownloadThreads(int maxDownloadThreads) {
+    public QuietConfig setMaxDownloadThreads(int maxDownloadThreads) {
         this.mMaxDownloadThreads = maxDownloadThreads;
         return this;
     }
@@ -75,12 +81,12 @@ public class DownloadConfig {
         return mDownloadDir;
     }
 
-    public DownloadConfig setDownloadDir(File downloadDir) {
+    public QuietConfig setDownloadDir(File downloadDir) {
         this.mDownloadDir = downloadDir;
         return this;
     }
 
-    public DownloadConfig setDebug(boolean debug){
+    public QuietConfig setDebug(boolean debug) {
         isDebug = debug;
         return this;
     }
@@ -89,7 +95,7 @@ public class DownloadConfig {
         return mMinOperateInterval;
     }
 
-    public DownloadConfig setMinOperateInterval(int minOperateInterval) {
+    public QuietConfig setMinOperateInterval(int minOperateInterval) {
         this.mMinOperateInterval = minOperateInterval;
         return this;
     }
@@ -98,7 +104,7 @@ public class DownloadConfig {
         return mRecoverDownloadWhenStart;
     }
 
-    public DownloadConfig setRecoverDownloadWhenStart(boolean recoverDownloadWhenStart) {
+    public QuietConfig setRecoverDownloadWhenStart(boolean recoverDownloadWhenStart) {
         this.mRecoverDownloadWhenStart = recoverDownloadWhenStart;
         return this;
     }
@@ -107,12 +113,38 @@ public class DownloadConfig {
         return mMaxRetryCount;
     }
 
-    public DownloadConfig setMaxRetryCount(int maxRetryCount) {
+    public QuietConfig setMaxRetryCount(int maxRetryCount) {
         this.mMaxRetryCount = maxRetryCount;
         return this;
     }
 
     public File getDownloadFile(String url) {
         return new File(mDownloadDir, FileUtils.getMd5FileName(url));
+    }
+
+
+    private HandlerNetwork mHandlerNetwork;
+
+    public HandlerNetwork getHandlerNetwork() {
+        return mHandlerNetwork;
+    }
+
+    /**
+     * @see HandlerNetwork 处理网络情况
+     */
+    public QuietConfig setHandlerNetworkListener(HandlerNetwork handlerNetworkListener) {
+        this.mHandlerNetwork = handlerNetworkListener;
+        return this;
+    }
+
+
+    public interface HandlerNetwork {
+        /**
+         * 处理网络状况接口
+         *
+         * @return true:  消费该事件终止运行下载任务
+         * false: 正常执行下载任务
+         */
+        boolean onHandlerNetworkStatus();
     }
 }

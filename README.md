@@ -2,7 +2,7 @@
 
 > 如果你觉得这个lib对你有用,随手给个Star,让我知道它是对你有帮助的,我会继续更新和维护它。
 
-![image.png](https://upload-images.jianshu.io/upload_images/2651056-fb06d3eb9120c2d9.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+![image](/img/gif/download_test.gif)
 
 ### 功能
 

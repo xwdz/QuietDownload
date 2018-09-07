@@ -67,7 +67,7 @@ class DataChanger extends Observable {
     public ArrayList<DownloadEntry> queryAllRecoverableEntries() {
         ArrayList<DownloadEntry> mRecoverableEntries = null;
         for (Map.Entry<String, DownloadEntry> entry : mOperatedEntries.entrySet()) {
-            if (entry.getValue().status == DownloadEntry.DownloadStatus.paused) {
+            if (entry.getValue().status == DownloadEntry.DownloadStatus.PAUSED) {
                 if (mRecoverableEntries == null) {
                     mRecoverableEntries = new ArrayList<>();
                 }

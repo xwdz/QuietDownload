@@ -43,7 +43,7 @@ public class DownloadEntry implements Serializable, Cloneable {
     @DatabaseField
     public int totalLength;
     @DatabaseField
-    public DownloadStatus status = DownloadStatus.idle;
+    public DownloadStatus status = DownloadStatus.IDLE;
     @DatabaseField
     public boolean isSupportRange = false;
     @DatabaseField(dataType = DataType.SERIALIZABLE)
@@ -52,7 +52,6 @@ public class DownloadEntry implements Serializable, Cloneable {
     public DownloadEntry() {
 
     }
-
 
 
     public DownloadEntry(String url) {
@@ -71,7 +70,7 @@ public class DownloadEntry implements Serializable, Cloneable {
     }
 
     public enum DownloadStatus {
-        idle, waiting, connecting, downloading, paused, resumed, cancelled, completed, error
+        IDLE, WAITING, CONNECTING, DOWNLOADING, PAUSED, CANCELLED, COMPLETED, ERROR
     }
 
     @Override

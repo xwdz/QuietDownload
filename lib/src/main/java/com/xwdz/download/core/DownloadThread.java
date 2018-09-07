@@ -87,7 +87,7 @@ public class DownloadThread implements Runnable {
 
 
     private boolean realRun() {
-        mStatus = DownloadEntry.DownloadStatus.downloading;
+        mStatus = DownloadEntry.DownloadStatus.DOWNLOADING;
         HttpURLConnection connection = null;
         try {
             connection = (HttpURLConnection) new URL(mUrl).openConnection();
@@ -148,19 +148,19 @@ public class DownloadThread implements Runnable {
                     }
                 }
             } else {
-                mStatus = DownloadEntry.DownloadStatus.error;
-                mListener.onDownloadError(mThreadIndex, "server error:" + responseCode);
+                mStatus = DownloadEntry.DownloadStatus.ERROR;
+                mListener.onDownloadError(mThreadIndex, "server ERROR:" + responseCode);
             }
         } catch (Throwable e) {
             e.printStackTrace();
             if (isPaused) {
-                mStatus = DownloadEntry.DownloadStatus.paused;
+                mStatus = DownloadEntry.DownloadStatus.PAUSED;
                 mListener.onDownloadPaused(mThreadIndex);
             } else if (isCancelled) {
-                mStatus = DownloadEntry.DownloadStatus.cancelled;
+                mStatus = DownloadEntry.DownloadStatus.CANCELLED;
                 mListener.onDownloadCancelled(mThreadIndex);
             } else {
-                mStatus = DownloadEntry.DownloadStatus.error;
+                mStatus = DownloadEntry.DownloadStatus.ERROR;
                 mListener.onDownloadError(mThreadIndex, e.getMessage());
             }
 
@@ -171,16 +171,16 @@ public class DownloadThread implements Runnable {
             }
 
             if (isPaused) {
-                mStatus = DownloadEntry.DownloadStatus.paused;
+                mStatus = DownloadEntry.DownloadStatus.PAUSED;
                 mListener.onDownloadPaused(mThreadIndex);
             } else if (isCancelled) {
-                mStatus = DownloadEntry.DownloadStatus.cancelled;
+                mStatus = DownloadEntry.DownloadStatus.CANCELLED;
                 mListener.onDownloadCancelled(mThreadIndex);
             } else if (isError) {
-                mStatus = DownloadEntry.DownloadStatus.error;
-                mListener.onDownloadError(mThreadIndex, "cancel manually by error");
+                mStatus = DownloadEntry.DownloadStatus.ERROR;
+                mListener.onDownloadError(mThreadIndex, "cancel manually by ERROR");
             } else {
-                mStatus = DownloadEntry.DownloadStatus.completed;
+                mStatus = DownloadEntry.DownloadStatus.COMPLETED;
                 mListener.onDownloadCompleted(mThreadIndex);
             }
         }
@@ -189,7 +189,7 @@ public class DownloadThread implements Runnable {
 
 
     public boolean isRunning() {
-        return mStatus == DownloadEntry.DownloadStatus.downloading;
+        return mStatus == DownloadEntry.DownloadStatus.DOWNLOADING;
     }
 
     public void pause() {

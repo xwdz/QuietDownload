@@ -56,7 +56,7 @@ public class ConnectThread implements Runnable {
                 }
                 mListener.onConnected(isSupportRange, contentLength);
             } else {
-                mListener.onConnectError("server error:" + responseCode);
+                mListener.onConnectError("server ERROR:" + responseCode);
             }
             isRunning = false;
         } catch (IOException e) {

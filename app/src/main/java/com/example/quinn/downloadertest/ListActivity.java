@@ -142,8 +142,8 @@ public class ListActivity extends AppCompatActivity {
             holder.mDownloadBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (entry.status == DownloadEntry.DownloadStatus.idle || entry.status == DownloadEntry.DownloadStatus.cancelled
-                            || entry.status == DownloadEntry.DownloadStatus.paused) {
+                    if (entry.status == DownloadEntry.DownloadStatus.IDLE || entry.status == DownloadEntry.DownloadStatus.CANCELLED
+                            || entry.status == DownloadEntry.DownloadStatus.PAUSED) {
                         mQuietDownloader.download(entry);
                     }
                 }
@@ -152,7 +152,7 @@ public class ListActivity extends AppCompatActivity {
             holder.mPause.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (entry.status == DownloadEntry.DownloadStatus.downloading) {
+                    if (entry.status == DownloadEntry.DownloadStatus.DOWNLOADING) {
                         mQuietDownloader.pause(entry);
                     }
                 }

@@ -34,7 +34,7 @@
 allprojects {
     repositories {
         jcenter()
-			maven { url "https://jitpack.io" }
+        maven { url "https://jitpack.io" }
     }
 }
 ```
@@ -83,7 +83,8 @@ implementation 'com.xwdz:QuietDownloader:$lastVersion'
                    *         false: 正常执行下载任务
                    */
                   boolean onHandlerNetworkStatus();
-              }
+    }
+              
     QuietConfig.getImpl().setHandlerNetworkListener(new QuietDownloadConfig.HandlerNetwork() {
          @Override
          public boolean onHandlerNetworkStatus() {
@@ -91,6 +92,38 @@ implementation 'com.xwdz:QuietDownloader:$lastVersion'
              return false;
          }
      });
+     
+     
+#### 关于监听
+
+`QuiteDownload` 并没有采用传统listener方式，而是使用了观察者模式,如需要在某个界面监听下载进度
+
+```
+    private final DataUpdateWatcher mDataUpdateReceiver = new DataUpdateWatcher() {
+        @Override
+        public void notifyUpdate(DownloadEntry entry) {
+            // calback mainUIThread 
+            // do something
+            // 可根据 entry status来判断一些列状态
+            if(entry.status == DownloadEntry.pause || DownloadEntry.downloading ...)
+        }
+    };
+    
+    // 省略若干代码
+    
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mDownloader.addObserver(mDataUpdateReceiver);
+    }
+    
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mDownloader.removeObserver(mDataUpdateReceiver);
+    }
+    
+```
                         
                         
                         
@@ -114,16 +147,33 @@ public class DownloadEntry implements Serializable {
 
     }
     // ... 省略代码
+    
+    @Override
+        public boolean equals(Object o) {
+            return o.hashCode() == this.hashCode();
+        }
+    
+        @Override
+        public int hashCode() {
+            final int PRIME = 31;
+            int result = 1;
+            result = PRIME * result + id.hashCode();
+            return result;
+    }
 }
 
-Quited内部使用DownloadEntry实体类进行关联
 ```
+
+#### 注意
+- DownloadEntry实体类重写其 equals 以及 hashCode 方法，使用其 id hashCode 来作为其标准
+- QuietDownloader内部使用DownloadEntry实体类进行关联
+
 
 #### DownloadEntry的几种状态
 
 ```
 public enum DownloadStatus {
-        idle, waiting, connecting, downloading, paused, resumed, cancelled, completed, error
+        IDLE, WAITING, CONNECTING, DOWNLOADING, PAUSED, CANCELLED, COMPLETED, ERROR
 }
 ```
                         
@@ -150,35 +200,6 @@ private final DownloadEntry downloadEntry = new DownloadEntry("url");
   // 暂停所有
   mDownloader.pauseAll(downloadEntry);
   
-```
-
-#### 关于监听
-
-`QuiteDownload` 并没有采用传统listener方式，而是使用了观察者模式,如需要在某个界面监听下载进度
-
-```
-    private final DataUpdateWatcher mDataUpdateReceiver = new DataUpdateWatcher() {
-        @Override
-        public void notifyUpdate(DownloadEntry data) {
-            // calback mainUIThread 
-            // do something
-        }
-    };
-    
-    // 省略若干代码
-    
-    @Override
-    protected void onResume() {
-        super.onResume();
-        mDownloader.addObserver(mDataUpdateReceiver);
-    }
-    
-    @Override
-    protected void onPause() {
-        super.onPause();
-        mDownloader.removeObserver(mDataUpdateReceiver);
-    }
-    
 ```
 
 

@@ -48,7 +48,7 @@ public class DownloadService extends Service {
     public static final int NOTIFY_PAUSED_OR_CANCELLED = 3;
     public static final int NOTIFY_COMPLETED = 4;
     public static final int NOTIFY_CONNECTING = 5;
-    //    1. net error 2. no sd 3. no memory
+    //    1. net ERROR 2. no sd 3. no memory
     public static final int NOTIFY_ERROR = 6;
     @SuppressLint("NewApi")
     private ArrayMap<String, DownloadTaskManager> mDownloadingTasks = new ArrayMap<>();
@@ -102,20 +102,20 @@ public class DownloadService extends Service {
         ArrayList<DownloadEntry> downloadEntrys = mDBController.queryAll();
         if (downloadEntrys != null) {
             for (DownloadEntry downloadEntry : downloadEntrys) {
-                if (downloadEntry.status == DownloadEntry.DownloadStatus.downloading || downloadEntry.status == DownloadEntry.DownloadStatus.waiting) {
+                if (downloadEntry.status == DownloadEntry.DownloadStatus.DOWNLOADING || downloadEntry.status == DownloadEntry.DownloadStatus.WAITING) {
                     if (QuietConfig.getImpl().isRecoverDownloadWhenStart()) {
                         if (downloadEntry.isSupportRange) {
-                            downloadEntry.status = DownloadEntry.DownloadStatus.paused;
+                            downloadEntry.status = DownloadEntry.DownloadStatus.PAUSED;
                         } else {
-                            downloadEntry.status = DownloadEntry.DownloadStatus.idle;
+                            downloadEntry.status = DownloadEntry.DownloadStatus.IDLE;
                             downloadEntry.reset();
                         }
                         addDownload(downloadEntry);
                     } else {
                         if (downloadEntry.isSupportRange) {
-                            downloadEntry.status = DownloadEntry.DownloadStatus.paused;
+                            downloadEntry.status = DownloadEntry.DownloadStatus.PAUSED;
                         } else {
-                            downloadEntry.status = DownloadEntry.DownloadStatus.idle;
+                            downloadEntry.status = DownloadEntry.DownloadStatus.IDLE;
                             downloadEntry.reset();
                         }
                         mDBController.newOrUpdate(downloadEntry);
@@ -183,7 +183,7 @@ public class DownloadService extends Service {
     private void pauseAll() {
         while (mWaitingQueue.iterator().hasNext()) {
             DownloadEntry downloadEntry = mWaitingQueue.poll();
-            downloadEntry.status = DownloadEntry.DownloadStatus.paused;
+            downloadEntry.status = DownloadEntry.DownloadStatus.PAUSED;
 //            FIXME notify all once
             mDataChanger.postStatus(downloadEntry);
         }
@@ -198,7 +198,7 @@ public class DownloadService extends Service {
     private void addDownload(DownloadEntry downloadEntry) {
         if (mDownloadingTasks.size() >= QuietConfig.getImpl().getMaxDownloadTasks()) {
             mWaitingQueue.offer(downloadEntry);
-            downloadEntry.status = DownloadEntry.DownloadStatus.waiting;
+            downloadEntry.status = DownloadEntry.DownloadStatus.WAITING;
             mDataChanger.postStatus(downloadEntry);
         } else {
             startDownload(downloadEntry);
@@ -211,7 +211,7 @@ public class DownloadService extends Service {
             task.cancel();
         } else {
             mWaitingQueue.remove(downloadEntry);
-            downloadEntry.status = DownloadEntry.DownloadStatus.cancelled;
+            downloadEntry.status = DownloadEntry.DownloadStatus.CANCELLED;
             mDataChanger.postStatus(downloadEntry);
         }
     }
@@ -226,7 +226,7 @@ public class DownloadService extends Service {
             task.pause();
         } else {
             mWaitingQueue.remove(downloadEntry);
-            downloadEntry.status = DownloadEntry.DownloadStatus.paused;
+            downloadEntry.status = DownloadEntry.DownloadStatus.PAUSED;
             mDataChanger.postStatus(downloadEntry);
         }
     }

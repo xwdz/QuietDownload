@@ -57,7 +57,7 @@ public class DownloadTaskManager implements ConnectThread.ConnectListener, Downl
     }
 
     public void pause() {
-        Logger.e(TAG, "download paused");
+        Logger.e(TAG, "download PAUSED");
         isPaused = true;
         //todo  connect Thread cancel...
 //        if (mConnectThread != null && mConnectThread.isRunning()) {
@@ -77,7 +77,7 @@ public class DownloadTaskManager implements ConnectThread.ConnectListener, Downl
     }
 
     public void cancel() {
-        Logger.e(TAG, "download cancelled");
+        Logger.e(TAG, "download CANCELLED");
         isCancelled = true;
         //todo  connect Thread cancel...
 
@@ -95,7 +95,7 @@ public class DownloadTaskManager implements ConnectThread.ConnectListener, Downl
             Logger.e(TAG, "no need to check if support range and totalLength");
             startDownload();
         } else {
-            mDownloadEntry.status = (DownloadEntry.DownloadStatus.connecting);
+            mDownloadEntry.status = (DownloadEntry.DownloadStatus.CONNECTING);
             notifyUpdate(mDownloadEntry, DownloadService.NOTIFY_CONNECTING);
             mConnectThread = new ConnectThread(mDownloadEntry.url, this);
             mExecutor.execute(mConnectThread);
@@ -113,7 +113,7 @@ public class DownloadTaskManager implements ConnectThread.ConnectListener, Downl
 
     private void startMultiDownload() {
         Logger.e(TAG, "startMultiDownload");
-        mDownloadEntry.status = (DownloadEntry.DownloadStatus.downloading);
+        mDownloadEntry.status = (DownloadEntry.DownloadStatus.DOWNLOADING);
         notifyUpdate(mDownloadEntry, DownloadService.NOTIFY_DOWNLOADING);
         int block = mDownloadEntry.totalLength / QuietConfig.getImpl().getMaxDownloadThreads();
         int startPos = 0;
@@ -135,17 +135,17 @@ public class DownloadTaskManager implements ConnectThread.ConnectListener, Downl
             }
             if (startPos < endPos) {
                 mDownloadThreads[i] = new DownloadThread(mDownloadEntry.url, destFile, i, startPos, endPos, this);
-                mDownloadStatus[i] = DownloadEntry.DownloadStatus.downloading;
+                mDownloadStatus[i] = DownloadEntry.DownloadStatus.DOWNLOADING;
                 mExecutor.execute(mDownloadThreads[i]);
             } else {
-                mDownloadStatus[i] = DownloadEntry.DownloadStatus.completed;
+                mDownloadStatus[i] = DownloadEntry.DownloadStatus.COMPLETED;
             }
         }
     }
 
     private void startSingleDownload() {
         Logger.e(TAG, "startSingleDownload");
-        mDownloadEntry.status = DownloadEntry.DownloadStatus.downloading;
+        mDownloadEntry.status = DownloadEntry.DownloadStatus.DOWNLOADING;
         notifyUpdate(mDownloadEntry, DownloadService.NOTIFY_DOWNLOADING);
         mDownloadStatus = new DownloadEntry.DownloadStatus[1];
         mDownloadStatus[0] = mDownloadEntry.status;
@@ -181,10 +181,10 @@ public class DownloadTaskManager implements ConnectThread.ConnectListener, Downl
     @Override
     public void onConnectError(String message) {
         if (isPaused || isCancelled) {
-            mDownloadEntry.status = isPaused ? DownloadEntry.DownloadStatus.paused : DownloadEntry.DownloadStatus.cancelled;
+            mDownloadEntry.status = isPaused ? DownloadEntry.DownloadStatus.PAUSED : DownloadEntry.DownloadStatus.CANCELLED;
             notifyUpdate(mDownloadEntry, DownloadService.NOTIFY_PAUSED_OR_CANCELLED);
         } else {
-            mDownloadEntry.status = DownloadEntry.DownloadStatus.error;
+            mDownloadEntry.status = DownloadEntry.DownloadStatus.ERROR;
             notifyUpdate(mDownloadEntry, DownloadService.NOTIFY_ERROR);
         }
     }
@@ -207,21 +207,21 @@ public class DownloadTaskManager implements ConnectThread.ConnectListener, Downl
 
     @Override
     public synchronized void onDownloadCompleted(int index) {
-        mDownloadStatus[index] = DownloadEntry.DownloadStatus.completed;
+        mDownloadStatus[index] = DownloadEntry.DownloadStatus.COMPLETED;
 
         for (int i = 0; i < mDownloadStatus.length; i++) {
-            if (mDownloadStatus[i] != DownloadEntry.DownloadStatus.completed) {
+            if (mDownloadStatus[i] != DownloadEntry.DownloadStatus.COMPLETED) {
                 mDownloadThreads[i].completed();
                 return;
             }
         }
 
         if (mDownloadEntry.totalLength > 0 && mDownloadEntry.currentLength != mDownloadEntry.totalLength) {
-            mDownloadEntry.status = DownloadEntry.DownloadStatus.error;
+            mDownloadEntry.status = DownloadEntry.DownloadStatus.ERROR;
             resetDownload();
             notifyUpdate(mDownloadEntry, DownloadService.NOTIFY_ERROR);
         } else {
-            mDownloadEntry.status = DownloadEntry.DownloadStatus.completed;
+            mDownloadEntry.status = DownloadEntry.DownloadStatus.COMPLETED;
             notifyUpdate(mDownloadEntry, DownloadService.NOTIFY_COMPLETED);
         }
     }
@@ -233,43 +233,43 @@ public class DownloadTaskManager implements ConnectThread.ConnectListener, Downl
     @Override
     public synchronized void onDownloadError(int index, String message) {
         Logger.e(TAG, "onDownloadError:" + message);
-        mDownloadStatus[index] = DownloadEntry.DownloadStatus.error;
+        mDownloadStatus[index] = DownloadEntry.DownloadStatus.ERROR;
 
 //        TODO download retry operation
         for (int i = 0; i < mDownloadStatus.length; i++) {
-            if (mDownloadStatus[i] != DownloadEntry.DownloadStatus.completed && mDownloadStatus[i] != DownloadEntry.DownloadStatus.error) {
+            if (mDownloadStatus[i] != DownloadEntry.DownloadStatus.COMPLETED && mDownloadStatus[i] != DownloadEntry.DownloadStatus.ERROR) {
                 mDownloadThreads[i].cancelByError();
                 return;
             }
         }
 
-        mDownloadEntry.status = DownloadEntry.DownloadStatus.error;
+        mDownloadEntry.status = DownloadEntry.DownloadStatus.ERROR;
         notifyUpdate(mDownloadEntry, DownloadService.NOTIFY_ERROR);
     }
 
     @Override
     public synchronized void onDownloadPaused(int index) {
-        mDownloadStatus[index] = DownloadEntry.DownloadStatus.paused;
+        mDownloadStatus[index] = DownloadEntry.DownloadStatus.PAUSED;
 
         for (int i = 0; i < mDownloadStatus.length; i++) {
-            if (mDownloadStatus[i] != DownloadEntry.DownloadStatus.completed && mDownloadStatus[i] != DownloadEntry.DownloadStatus.paused) {
+            if (mDownloadStatus[i] != DownloadEntry.DownloadStatus.COMPLETED && mDownloadStatus[i] != DownloadEntry.DownloadStatus.PAUSED) {
                 return;
             }
         }
 
-        mDownloadEntry.status = DownloadEntry.DownloadStatus.paused;
+        mDownloadEntry.status = DownloadEntry.DownloadStatus.PAUSED;
         notifyUpdate(mDownloadEntry, DownloadService.NOTIFY_PAUSED_OR_CANCELLED);
     }
 
     @Override
     public synchronized void onDownloadCancelled(int index) {
-        mDownloadStatus[index] = DownloadEntry.DownloadStatus.cancelled;
+        mDownloadStatus[index] = DownloadEntry.DownloadStatus.CANCELLED;
         for (int i = 0; i < mDownloadStatus.length; i++) {
-            if (mDownloadStatus[i] != DownloadEntry.DownloadStatus.completed && mDownloadStatus[i] != DownloadEntry.DownloadStatus.cancelled) {
+            if (mDownloadStatus[i] != DownloadEntry.DownloadStatus.COMPLETED && mDownloadStatus[i] != DownloadEntry.DownloadStatus.CANCELLED) {
                 return;
             }
         }
-        mDownloadEntry.status = DownloadEntry.DownloadStatus.cancelled;
+        mDownloadEntry.status = DownloadEntry.DownloadStatus.CANCELLED;
         resetDownload();
         notifyUpdate(mDownloadEntry, DownloadService.NOTIFY_PAUSED_OR_CANCELLED);
     }

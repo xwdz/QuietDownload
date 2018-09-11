@@ -246,10 +246,10 @@ public class DownloadService extends Service {
      * @return 检查是否处理网络情况
      */
     private boolean checkIsHandlerNetwork() {
-        QuietConfig.HandlerNetwork mHandlerNetwork = QuietConfig.getImpl().getHandlerNetwork();
+        QuietConfig.HandlerNetworkListener mHandlerNetworkListener = QuietConfig.getImpl().getHandlerNetworkListener();
         boolean handlerNetwork = false;
-        if (mHandlerNetwork != null) {
-            handlerNetwork = mHandlerNetwork.onHandlerNetworkStatus();
+        if (mHandlerNetworkListener != null) {
+            handlerNetwork = mHandlerNetworkListener.onHandlerNetworkStatus();
         }
 
         if (handlerNetwork) {

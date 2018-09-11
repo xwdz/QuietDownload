@@ -123,22 +123,31 @@ public class QuietConfig {
     }
 
 
-    private HandlerNetwork mHandlerNetwork;
+    private HandlerNetworkListener mHandlerNetworkListener;
+    private HandlerApkInfoEventListener mHandlerApkInfoEventListener;
 
-    public HandlerNetwork getHandlerNetwork() {
-        return mHandlerNetwork;
+    public HandlerNetworkListener getHandlerNetworkListener() {
+        return mHandlerNetworkListener;
+    }
+
+    public HandlerApkInfoEventListener getHandlerApkInfoEventListener() {
+        return mHandlerApkInfoEventListener;
+    }
+
+    public void setHandlerApkInfoEventListener(HandlerApkInfoEventListener handlerApkInfoEventListener) {
+        mHandlerApkInfoEventListener = handlerApkInfoEventListener;
     }
 
     /**
-     * @see HandlerNetwork 处理网络情况
+     * @see HandlerNetworkListener 处理网络情况
      */
-    public QuietConfig setHandlerNetworkListener(HandlerNetwork handlerNetworkListener) {
-        this.mHandlerNetwork = handlerNetworkListener;
+    public QuietConfig setHandlerNetworkListener(HandlerNetworkListener handlerNetworkListenerListener) {
+        this.mHandlerNetworkListener = handlerNetworkListenerListener;
         return this;
     }
 
 
-    public interface HandlerNetwork {
+    public interface HandlerNetworkListener {
         /**
          * 处理网络状况接口
          *
@@ -146,5 +155,16 @@ public class QuietConfig {
          * false: 正常执行下载任务
          */
         boolean onHandlerNetworkStatus();
+    }
+
+
+    public interface HandlerApkInfoEventListener {
+        /**
+         * 处理通过网络获取到待下载 Apk 的信息，apkName，apkFileSize
+         *
+         * @return true:  消费该事件
+         * false: 正常执行流程
+         */
+        boolean onHandlerDownloadFile();
     }
 }

@@ -39,7 +39,7 @@ public class App extends Application {
                 .initDownloadFile(this)
                 .setMaxDownloadTasks(5)
                 .setRecoverDownloadWhenStart(true)
-                .setHandlerNetworkListener(new QuietConfig.HandlerNetwork() {
+                .setHandlerNetworkListener(new QuietConfig.HandlerNetworkListener() {
             @Override
             public boolean onHandlerNetworkStatus() {
                 return false;

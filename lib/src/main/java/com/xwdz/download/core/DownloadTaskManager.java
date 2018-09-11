@@ -80,7 +80,6 @@ public class DownloadTaskManager implements ConnectThread.ConnectListener, Downl
         Logger.e(TAG, "download CANCELLED");
         isCancelled = true;
         //todo  connect Thread cancel...
-
         if (mDownloadThreads != null && mDownloadThreads.length > 0) {
             for (int i = 0; i < mDownloadThreads.length; i++) {
                 if (mDownloadThreads[i] != null && mDownloadThreads[i].isRunning()) {
@@ -174,6 +173,11 @@ public class DownloadTaskManager implements ConnectThread.ConnectListener, Downl
     public void onConnected(boolean isSupportRange, int totalLength) {
         mDownloadEntry.isSupportRange = isSupportRange;
         mDownloadEntry.totalLength = totalLength;
+
+        QuietConfig.HandlerApkInfoEventListener handlerApkInfoEventListener = QuietConfig.getImpl().getHandlerApkInfoEventListener();
+        if (handlerApkInfoEventListener.onHandlerDownloadFile()) {
+            return;
+        }
 
         startDownload();
     }

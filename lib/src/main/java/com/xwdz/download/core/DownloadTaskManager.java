@@ -169,10 +169,7 @@ public class DownloadTaskManager implements ConnectThread.ConnectListener, Downl
         mDownloadEntry.isSupportRange = isSupportRange;
         mDownloadEntry.totalLength = totalLength;
 
-        QuietConfig.HandlerApkInfoEventListener handlerApkInfoEventListener = QuietConfig.getImpl().getHandlerApkInfoEventListener();
-        if (handlerApkInfoEventListener.onHandlerDownloadFile(mDownloadEntry)) {
-            return;
-        }
+        mDownloadEntry.status = DownloadEntry.DownloadStatus.CONNECT_SUCCESSFUL;
 
         startDownload();
     }

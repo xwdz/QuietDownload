@@ -48,7 +48,6 @@ public class DownloadService extends Service {
     public static final int NOTIFY_PAUSED_OR_CANCELLED = 3;
     public static final int NOTIFY_COMPLETED = 4;
     public static final int NOTIFY_CONNECTING = 5;
-    //    1. net ERROR 2. no sd 3. no memory
     public static final int NOTIFY_ERROR = 6;
     @SuppressLint("NewApi")
     private ArrayMap<String, DownloadTaskManager> mDownloadingTasks = new ArrayMap<>();

@@ -21,7 +21,7 @@ import android.content.Intent;
 
 import com.xwdz.download.QuietConfig;
 import com.xwdz.download.db.DownloadEntry;
-import com.xwdz.download.notify.DataUpdateWatcher;
+import com.xwdz.download.notify.DataUpdatedWatcher;
 import com.xwdz.download.utils.Constants;
 import com.xwdz.download.utils.Logger;
 
@@ -155,17 +155,17 @@ public class QuietDownloader {
 
     /**
      * 添加一个数据接收器
-     * @see DataUpdateWatcher
+     * @see DataUpdatedWatcher
      */
-    public void addObserver(DataUpdateWatcher watcher) {
+    public void addObserver(DataUpdatedWatcher watcher) {
         mDataChanger.addObserver(watcher);
     }
 
     /**
      * 删除一个数据接收器
-     * @see DataUpdateWatcher
+     * @see DataUpdatedWatcher
      */
-    public void removeObserver(DataUpdateWatcher watcher) {
+    public void removeObserver(DataUpdatedWatcher watcher) {
         mDataChanger.deleteObserver(watcher);
     }
 

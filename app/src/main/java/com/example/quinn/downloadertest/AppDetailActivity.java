@@ -26,7 +26,7 @@ import android.widget.TextView;
 
 import com.xwdz.download.core.QuietDownloader;
 import com.xwdz.download.db.DownloadEntry;
-import com.xwdz.download.notify.DataUpdateWatcher;
+import com.xwdz.download.notify.DataUpdatedWatcher;
 
 public class AppDetailActivity extends AppCompatActivity {
 
@@ -35,7 +35,7 @@ public class AppDetailActivity extends AppCompatActivity {
     private AppEntry mAppEntry;
     private TextView mTextView;
     private ProgressBar mProgressBar;
-    private DataUpdateWatcher watcher = new DataUpdateWatcher() {
+    private DataUpdatedWatcher watcher = new DataUpdatedWatcher() {
 
         @Override
         public void notifyUpdate(DownloadEntry data) {

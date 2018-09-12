@@ -8,7 +8,7 @@ import android.widget.TextView;
 
 import com.xwdz.download.core.QuietDownloader;
 import com.xwdz.download.db.DownloadEntry;
-import com.xwdz.download.notify.DataUpdateWatcher;
+import com.xwdz.download.notify.DataUpdatedWatcher;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -21,7 +21,7 @@ public class MainActivity extends AppCompatActivity {
     private DownloadEntry mDownloadEntry;
 
 
-    private final DataUpdateWatcher mDataUpdateWatcher = new DataUpdateWatcher() {
+    private final DataUpdatedWatcher mDataUpdatedWatcher = new DataUpdatedWatcher() {
         @Override
         public void notifyUpdate(DownloadEntry data) {
             initializeData(data);
@@ -89,12 +89,12 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        mDownloader.addObserver(mDataUpdateWatcher);
+        mDownloader.addObserver(mDataUpdatedWatcher);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        mDownloader.removeObserver(mDataUpdateWatcher);
+        mDownloader.removeObserver(mDataUpdatedWatcher);
     }
 }

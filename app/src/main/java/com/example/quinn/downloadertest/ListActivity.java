@@ -30,7 +30,7 @@ import android.widget.TextView;
 
 import com.xwdz.download.core.QuietDownloader;
 import com.xwdz.download.db.DownloadEntry;
-import com.xwdz.download.notify.DataUpdateWatcher;
+import com.xwdz.download.notify.DataUpdatedWatcher;
 
 import java.util.ArrayList;
 
@@ -42,7 +42,7 @@ public class ListActivity extends AppCompatActivity {
 
     private QuietDownloader mQuietDownloader;
     private ArrayList<DownloadEntry> mDownloadEntries = new ArrayList<>();
-    private DataUpdateWatcher watcher = new DataUpdateWatcher() {
+    private DataUpdatedWatcher watcher = new DataUpdatedWatcher() {
         @Override
         public void notifyUpdate(DownloadEntry data) {
             int index = mDownloadEntries.indexOf(data);

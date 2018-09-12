@@ -19,7 +19,6 @@ package com.xwdz.download;
 import android.content.Context;
 import android.os.Environment;
 
-import com.xwdz.download.db.DownloadEntry;
 import com.xwdz.download.utils.FileUtils;
 
 import java.io.File;
@@ -127,18 +126,9 @@ public class QuietConfig {
 
 
     private HandlerNetworkListener mHandlerNetworkListener;
-    private HandlerApkInfoEventListener mHandlerApkInfoEventListener;
 
     public HandlerNetworkListener getHandlerNetworkListener() {
         return mHandlerNetworkListener;
-    }
-
-    public HandlerApkInfoEventListener getHandlerApkInfoEventListener() {
-        return mHandlerApkInfoEventListener;
-    }
-
-    public void setHandlerApkInfoEventListener(HandlerApkInfoEventListener handlerApkInfoEventListener) {
-        mHandlerApkInfoEventListener = handlerApkInfoEventListener;
     }
 
     /**
@@ -160,15 +150,4 @@ public class QuietConfig {
         boolean onHandlerNetworkStatus();
     }
 
-
-    public interface HandlerApkInfoEventListener {
-        /**
-         * 处理通过网络获取到待下载文件信息，apkName，apkFileSize
-         *
-         * @param downloadEntry 文件信息
-         * @return true: 消费该事件,false: 正常执行流程
-         */
-
-        boolean onHandlerDownloadFile(DownloadEntry downloadEntry);
-    }
 }

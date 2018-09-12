@@ -172,9 +172,26 @@ public class DownloadEntry implements Serializable {
 #### DownloadEntry的几种状态
 
 ```
-public enum DownloadStatus {
-        IDLE, WAITING, CONNECTING, DOWNLOADING, PAUSED, CANCELLED, COMPLETED, ERROR
-}
+ public enum DownloadStatus {
+        //空闲
+        IDLE,
+        // 等待
+        WAITING,
+        // 连接 获取下载信息
+        CONNECTING,
+        // 连接成功 即获取到下载文件大小等
+        CONNECT_SUCCESSFUL,
+        // 开始下载
+        DOWNLOADING,
+        // 暂停
+        PAUSED,
+        // 取消
+        CANCELLED,
+        // 完成
+        COMPLETED,
+        // 错误
+        ERROR
+    }
 ```
                         
 #### 使用方法

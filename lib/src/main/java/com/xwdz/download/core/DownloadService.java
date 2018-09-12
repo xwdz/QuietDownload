@@ -43,12 +43,15 @@ public class DownloadService extends Service {
 
     private static final String TAG = DownloadService.class.getSimpleName();
 
+
     public static final int NOTIFY_DOWNLOADING = 1;
     public static final int NOTIFY_UPDATING = 2;
     public static final int NOTIFY_PAUSED_OR_CANCELLED = 3;
     public static final int NOTIFY_COMPLETED = 4;
     public static final int NOTIFY_CONNECTING = 5;
     public static final int NOTIFY_ERROR = 6;
+    public static final int NOTIFY_CONNECT_SUCCESSFUL = 7;
+
     @SuppressLint("NewApi")
     private ArrayMap<String, DownloadTaskManager> mDownloadingTasks = new ArrayMap<>();
     private ExecutorService mExecutors;

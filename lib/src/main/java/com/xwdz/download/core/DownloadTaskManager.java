@@ -49,9 +49,9 @@ public class DownloadTaskManager implements ConnectThread.ConnectListener, Downl
     private File destFile;
 
 
-    public DownloadTaskManager(DownloadEntry downloadEntry, Handler mHandler, ExecutorService mExecutor) {
+    public DownloadTaskManager(DownloadEntry downloadEntry, Handler handler, ExecutorService mExecutor) {
         this.mDownloadEntry = downloadEntry;
-        this.mHandler = mHandler;
+        this.mHandler = handler;
         this.mExecutor = mExecutor;
         this.destFile = QuietConfig.getImpl().getDownloadFile(downloadEntry.url);
     }
@@ -168,9 +168,8 @@ public class DownloadTaskManager implements ConnectThread.ConnectListener, Downl
     public void onConnected(boolean isSupportRange, int totalLength) {
         mDownloadEntry.isSupportRange = isSupportRange;
         mDownloadEntry.totalLength = totalLength;
-
         mDownloadEntry.status = DownloadEntry.DownloadStatus.CONNECT_SUCCESSFUL;
-
+        notifyUpdate(mDownloadEntry, DownloadService.NOTIFY_CONNECT_SUCCESSFUL);
         startDownload();
     }
 

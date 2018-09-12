@@ -69,6 +69,18 @@ public class DownloadEntry implements Serializable, Cloneable {
         }
     }
 
+
+    public DownloadEntry newEntry(DownloadEntry entry) {
+        DownloadEntry downloadEntry = new DownloadEntry(entry.url);
+        downloadEntry.status = entry.status;
+        downloadEntry.currentLength = entry.currentLength;
+        downloadEntry.totalLength = entry.totalLength;
+        downloadEntry.isSupportRange = entry.isSupportRange;
+        downloadEntry.ranges = entry.ranges;
+        return downloadEntry;
+    }
+
+
     public enum DownloadStatus {
         IDLE, WAITING, CONNECTING, DOWNLOADING, PAUSED, CANCELLED, COMPLETED, ERROR
     }
@@ -83,6 +95,7 @@ public class DownloadEntry implements Serializable, Cloneable {
         return o.hashCode() == this.hashCode();
     }
 
+
     @Override
     public int hashCode() {
         final int PRIME = 31;
@@ -92,7 +105,7 @@ public class DownloadEntry implements Serializable, Cloneable {
     }
 
     @Override
-    protected Object clone() throws CloneNotSupportedException {
+    public Object clone() throws CloneNotSupportedException {
         return super.clone();
     }
 }

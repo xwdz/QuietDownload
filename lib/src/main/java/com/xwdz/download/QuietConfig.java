@@ -19,6 +19,7 @@ package com.xwdz.download;
 import android.content.Context;
 import android.os.Environment;
 
+import com.xwdz.download.db.DownloadEntry;
 import com.xwdz.download.utils.FileUtils;
 
 import java.io.File;
@@ -39,6 +40,8 @@ public class QuietConfig {
 
     //  FIXME: no implement
     private int mMaxRetryCount = 2;
+
+    // todo 处理 jar 包重复问题
 
     private QuietConfig() {
     }
@@ -160,11 +163,12 @@ public class QuietConfig {
 
     public interface HandlerApkInfoEventListener {
         /**
-         * 处理通过网络获取到待下载 Apk 的信息，apkName，apkFileSize
+         * 处理通过网络获取到待下载文件信息，apkName，apkFileSize
          *
-         * @return true:  消费该事件
-         * false: 正常执行流程
+         * @param downloadEntry 文件信息
+         * @return true: 消费该事件,false: 正常执行流程
          */
-        boolean onHandlerDownloadFile();
+
+        boolean onHandlerDownloadFile(DownloadEntry downloadEntry);
     }
 }

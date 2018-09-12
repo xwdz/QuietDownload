@@ -205,6 +205,7 @@ private final DownloadEntry downloadEntry = new DownloadEntry("url");
 
 ### TODO
  - 重试机制
+ - 拦截器实现
 
 
 

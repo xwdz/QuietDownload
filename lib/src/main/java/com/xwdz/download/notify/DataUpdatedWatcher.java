@@ -23,7 +23,7 @@ import java.util.Observable;
 import java.util.Observer;
 
 /**
- * @author ()
+ * @author xwdz(xwdz9989@gmail.com)
  * this class receiver data changed
  */
 public abstract class DataUpdatedWatcher implements Observer {

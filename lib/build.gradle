@@ -41,11 +41,11 @@ dependencies {
 
 def siteUrl = 'http://huangxingwei.cn'
 publish {
-    userOrg = 'quinnhuang'//bintray.com的用户名
-    repoName = 'widget'//远程仓库名字,不指明，默认是上传到maven
-    groupId = 'com.xwdz'//jcenter上的路径
-    artifactId = 'QuietDownloader'//项目名称 QuietDownloader
-    publishVersion = '0.0.3.1'//版本号
+    userOrg = 'quinnhuang'
+    repoName = 'widget'
+    groupId = 'com.xwdz'
+    artifactId = 'QuietDownloader'
+    publishVersion = '0.0.4'
     desc = '下载器'//描述，不重要
     website = siteUrl//项目主页
 }

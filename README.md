@@ -99,7 +99,7 @@ implementation 'com.xwdz:QuietDownloader:$lastVersion'
 `QuiteDownload` 并没有采用传统listener方式，而是使用了观察者模式,如需要在某个界面监听下载进度
 
 ```
-    private final DataUpdateWatcher mDataUpdateReceiver = new DataUpdateWatcher() {
+    private final DataUpdatedWatcher mDataUpdateReceiver = new DataUpdatedWatcher() {
         @Override
         public void notifyUpdate(DownloadEntry entry) {
             // calback mainUIThread 

@@ -220,12 +220,14 @@ public class DownloadEntry implements Serializable {
 
 
 
-
-
 ### TODO
  - 重试机制
  - 拦截器实现
 
+## 版本历史
+
+### v0.0.4
+  - 新增DownloadStatus连接成功`CONNECT_SUCCESSFUL`枚举
 
 
  

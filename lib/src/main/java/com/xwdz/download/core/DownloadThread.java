@@ -16,6 +16,7 @@
 
 package com.xwdz.download.core;
 
+import com.xwdz.download.QuietConfig;
 import com.xwdz.download.db.DownloadEntry;
 import com.xwdz.download.utils.Constants;
 
@@ -51,6 +52,7 @@ public class DownloadThread implements Runnable {
 
     private int mRetryCountIndex = 0;
 
+
     public DownloadThread(String url, File destFile, int threadIndex, int startPos, int endPos, DownloadListener listener) {
         this.mUrl = url;
         this.mThreadIndex = threadIndex;
@@ -64,29 +66,17 @@ public class DownloadThread implements Runnable {
     @Override
     public void run() {
         //todo not impl retry
-        realRun();
-//        final int retryCount = QuietConfig.getConfig().getMaxRetryCount();
-//        for (int i = 0; i < retryCount; i++) {
-//            if (mRetryCountIndex == retryCount && !isError) {
-//                Logger.d(TAG, "current retryCount:" + mRetryCountIndex + " setRetryCount:" + retryCount);
-//                break;
-//            }
-//
-//            if (!isCompleted) {
-//                boolean isError = realRun();
-//                if (isError) {
-//                    mRetryCountIndex++;
-//                    Logger.d(TAG, "retry count(" + mRetryCountIndex + ")" + "max retryCount:" + retryCount);
-//                    realRun();
-//                } else {
-//                    break;
-//                }
-//            }
-//        }
+        final int retryCount = QuietConfig.getImpl().getMaxRetryCount();
+        for (int i = 0; i < retryCount; i++) {
+            realRun();
+            if (isCompleted) {
+                return;
+            }
+        }
     }
 
 
-    private boolean realRun() {
+    private void realRun() {
         mStatus = DownloadEntry.DownloadStatus.DOWNLOADING;
         HttpURLConnection connection = null;
         try {
@@ -115,7 +105,6 @@ public class DownloadThread implements Runnable {
                             break;
                         }
                     }
-                    return true;
                 } finally {
                     if (raf != null) {
                         raf.close();
@@ -137,7 +126,6 @@ public class DownloadThread implements Runnable {
                             break;
                         }
                     }
-                    return true;
                 } finally {
                     if (fos != null) {
                         fos.close();
@@ -164,7 +152,6 @@ public class DownloadThread implements Runnable {
                 mListener.onDownloadError(mThreadIndex, e.getMessage());
             }
 
-            return false;
         } finally {
             if (connection != null) {
                 connection.disconnect();
@@ -184,7 +171,6 @@ public class DownloadThread implements Runnable {
                 mListener.onDownloadCompleted(mThreadIndex);
             }
         }
-        return false;
     }
 
 

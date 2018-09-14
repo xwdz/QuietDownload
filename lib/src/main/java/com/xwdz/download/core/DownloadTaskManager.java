@@ -157,11 +157,6 @@ public class DownloadTaskManager implements ConnectThread.ConnectListener, Downl
         msg.what = what;
         msg.obj = downloadEntry;
         mHandler.sendMessage(msg);
-//        try {
-//            Thread.sleep(10);
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
     }
 
     @Override

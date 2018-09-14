@@ -36,7 +36,7 @@ public class QuietConfig {
     private int mMaxDownloadThreads = 3;
     private File mDownloadDir = null;
     private int mMinOperateInterval = 1000;
-    private boolean mRecoverDownloadWhenStart = false;
+    private boolean mRecoverDownloadWhenStart = true;
 
     private final ArrayList<EventIntercept> mEventIntercepts = new ArrayList<>();
 

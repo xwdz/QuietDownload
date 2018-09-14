@@ -104,7 +104,15 @@ public class DownloadService extends Service {
         ArrayList<DownloadEntry> downloadEntrys = mDBController.queryAll();
         if (downloadEntrys != null) {
             for (DownloadEntry downloadEntry : downloadEntrys) {
-                if (downloadEntry.status == DownloadEntry.DownloadStatus.DOWNLOADING || downloadEntry.status == DownloadEntry.DownloadStatus.WAITING) {
+
+                if (downloadEntry.status == DownloadEntry.DownloadStatus.PAUSED) {
+                    // todo 暂停的自动赋值恢复进度
+                    Logger.d(TAG,"auto recover");
+//                    addDownload(downloadEntry);
+                }
+
+                if (downloadEntry.status == DownloadEntry.DownloadStatus.DOWNLOADING
+                        || downloadEntry.status == DownloadEntry.DownloadStatus.WAITING) {
                     if (QuietConfig.getImpl().isRecoverDownloadWhenStart()) {
                         if (downloadEntry.isSupportRange) {
                             downloadEntry.status = DownloadEntry.DownloadStatus.PAUSED;

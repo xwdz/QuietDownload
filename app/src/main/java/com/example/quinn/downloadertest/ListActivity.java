@@ -142,7 +142,8 @@ public class ListActivity extends AppCompatActivity {
             holder.mDownloadBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (entry.status == DownloadEntry.DownloadStatus.IDLE || entry.status == DownloadEntry.DownloadStatus.CANCELLED
+                    if (entry.status == DownloadEntry.DownloadStatus.IDLE
+                            || entry.status == DownloadEntry.DownloadStatus.CANCELLED
                             || entry.status == DownloadEntry.DownloadStatus.PAUSED) {
                         mQuietDownloader.download(entry);
                     }

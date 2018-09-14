@@ -16,7 +16,6 @@
 
 package com.xwdz.download.core;
 
-import com.xwdz.download.QuietConfig;
 import com.xwdz.download.db.DownloadEntry;
 import com.xwdz.download.utils.Constants;
 
@@ -50,8 +49,6 @@ public class DownloadThread implements Runnable {
     private volatile boolean isError;
     private volatile boolean isCompleted;
 
-    private int mRetryCountIndex = 0;
-
 
     public DownloadThread(String url, File destFile, int threadIndex, int startPos, int endPos, DownloadListener listener) {
         this.mUrl = url;
@@ -66,13 +63,7 @@ public class DownloadThread implements Runnable {
     @Override
     public void run() {
         //todo not impl retry
-        final int retryCount = QuietConfig.getImpl().getMaxRetryCount();
-        for (int i = 0; i < retryCount; i++) {
-            realRun();
-            if (isCompleted) {
-                return;
-            }
-        }
+        realRun();
     }
 
 
@@ -98,6 +89,7 @@ public class DownloadThread implements Runnable {
                     is = connection.getInputStream();
                     byte[] buffer = new byte[BUFF_SIZE];
                     int len = -1;
+
                     while ((len = is.read(buffer)) != -1) {
                         raf.write(buffer, 0, len);
                         mListener.onProgressChanged(mThreadIndex, len);
@@ -105,6 +97,7 @@ public class DownloadThread implements Runnable {
                             break;
                         }
                     }
+
                 } finally {
                     if (raf != null) {
                         raf.close();
@@ -119,13 +112,16 @@ public class DownloadThread implements Runnable {
                     is = connection.getInputStream();
                     byte[] buffer = new byte[BUFF_SIZE];
                     int len = -1;
+
                     while ((len = is.read(buffer)) != -1) {
                         fos.write(buffer, 0, len);
                         mListener.onProgressChanged(mThreadIndex, len);
                         if (isPaused || isCancelled || isError) {
                             break;
                         }
+
                     }
+
                 } finally {
                     if (fos != null) {
                         fos.close();
@@ -165,7 +161,7 @@ public class DownloadThread implements Runnable {
                 mListener.onDownloadCancelled(mThreadIndex);
             } else if (isError) {
                 mStatus = DownloadEntry.DownloadStatus.ERROR;
-                mListener.onDownloadError(mThreadIndex, "cancel manually by ERROR");
+                mListener.onDownloadError(mThreadIndex, "error");
             } else {
                 mStatus = DownloadEntry.DownloadStatus.COMPLETED;
                 mListener.onDownloadCompleted(mThreadIndex);

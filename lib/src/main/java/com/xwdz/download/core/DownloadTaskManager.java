@@ -170,6 +170,7 @@ public class DownloadTaskManager implements ConnectThread.ConnectListener, Downl
         mDownloadEntry.totalLength = totalLength;
         mDownloadEntry.status = DownloadEntry.DownloadStatus.CONNECT_SUCCESSFUL;
         notifyUpdate(mDownloadEntry, DownloadService.NOTIFY_CONNECT_SUCCESSFUL);
+
         startDownload();
     }
 
@@ -191,10 +192,6 @@ public class DownloadTaskManager implements ConnectThread.ConnectListener, Downl
             mDownloadEntry.ranges.put(index, range);
         }
         mDownloadEntry.currentLength += progress;
-//        long stamp = System.currentTimeMillis();
-//        if (stamp - mLastStamp > 1000) {
-//            mLastStamp = stamp;
-//        }
         if (TickTack.getInstance().needToNotify()) {
             notifyUpdate(mDownloadEntry, DownloadService.NOTIFY_UPDATING);
         }

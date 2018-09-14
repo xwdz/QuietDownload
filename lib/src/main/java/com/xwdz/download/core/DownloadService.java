@@ -68,7 +68,7 @@ public class DownloadService extends Service {
                     checkNext((DownloadEntry) msg.obj);
                     break;
             }
-            mDataChanger.postStatus((DownloadEntry) msg.obj);
+            mDataChanger.postNotifyStatus((DownloadEntry) msg.obj);
             return true;
         }
     });
@@ -186,8 +186,7 @@ public class DownloadService extends Service {
         while (mWaitingQueue.iterator().hasNext()) {
             DownloadEntry downloadEntry = mWaitingQueue.poll();
             downloadEntry.status = DownloadEntry.DownloadStatus.PAUSED;
-//            FIXME notify all once
-            mDataChanger.postStatus(downloadEntry);
+            mDataChanger.postNotifyStatus(downloadEntry);
         }
 
         for (Map.Entry<String, DownloadTaskManager> entry : mDownloadingTasks.entrySet()) {
@@ -201,7 +200,7 @@ public class DownloadService extends Service {
         if (mDownloadingTasks.size() >= QuietConfig.getImpl().getMaxDownloadTasks()) {
             mWaitingQueue.offer(downloadEntry);
             downloadEntry.status = DownloadEntry.DownloadStatus.WAITING;
-            mDataChanger.postStatus(downloadEntry);
+            mDataChanger.postNotifyStatus(downloadEntry);
         } else {
             startDownload(downloadEntry);
         }
@@ -214,7 +213,7 @@ public class DownloadService extends Service {
         } else {
             mWaitingQueue.remove(downloadEntry);
             downloadEntry.status = DownloadEntry.DownloadStatus.CANCELLED;
-            mDataChanger.postStatus(downloadEntry);
+            mDataChanger.postNotifyStatus(downloadEntry);
         }
     }
 
@@ -229,35 +228,23 @@ public class DownloadService extends Service {
         } else {
             mWaitingQueue.remove(downloadEntry);
             downloadEntry.status = DownloadEntry.DownloadStatus.PAUSED;
-            mDataChanger.postStatus(downloadEntry);
+            mDataChanger.postNotifyStatus(downloadEntry);
         }
     }
 
     private void startDownload(DownloadEntry downloadEntry) {
-        boolean handler = checkIsHandlerNetwork();
-        if (handler){
-            return;
+        ArrayList<EventIntercept> eventIntercepts = QuietConfig.getImpl().getEventIntercepts();
+        if (!eventIntercepts.isEmpty()) {
+            for (EventIntercept eventIntercept : eventIntercepts) {
+                boolean result = eventIntercept.onIntnercept(downloadEntry);
+                if (result) {
+                    return;
+                }
+            }
         }
-
         DownloadTaskManager task = new DownloadTaskManager(downloadEntry, mHandler, mExecutors);
         task.start();
         mDownloadingTasks.put(downloadEntry.id, task);
     }
 
-    /**
-     * @return 检查是否处理网络情况
-     */
-    private boolean checkIsHandlerNetwork() {
-        QuietConfig.HandlerNetworkListener mHandlerNetworkListener = QuietConfig.getImpl().getHandlerNetworkListener();
-        boolean handlerNetwork = false;
-        if (mHandlerNetworkListener != null) {
-            handlerNetwork = mHandlerNetworkListener.onHandlerNetworkStatus();
-        }
-
-        if (handlerNetwork) {
-            Logger.d(TAG, "handler network,end.");
-            return true;
-        }
-        return false;
-    }
 }

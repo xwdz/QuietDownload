@@ -19,9 +19,11 @@ package com.xwdz.download;
 import android.content.Context;
 import android.os.Environment;
 
+import com.xwdz.download.core.EventIntercept;
 import com.xwdz.download.utils.FileUtils;
 
 import java.io.File;
+import java.util.ArrayList;
 
 /**
  * @author xwdz(xwdz9989@gmail.com)
@@ -36,11 +38,13 @@ public class QuietConfig {
     private int mMinOperateInterval = 1000;
     private boolean mRecoverDownloadWhenStart = false;
 
+    private final ArrayList<EventIntercept> mEventIntercepts = new ArrayList<>();
 
-    //  FIXME: no implement
+
+    //  todo: no imp
+    // todo 处理 jar 包重复问题
     private int mMaxRetryCount = 2;
 
-    // todo 处理 jar 包重复问题
 
     private QuietConfig() {
     }
@@ -122,6 +126,18 @@ public class QuietConfig {
 
     public File getDownloadFile(String url) {
         return new File(mDownloadDir, FileUtils.getMd5FileName(url));
+    }
+
+    public void setEventIntercepts(ArrayList<EventIntercept> list) {
+        mEventIntercepts.addAll(list);
+    }
+
+    public void setEventIntercepts(EventIntercept intercept) {
+        mEventIntercepts.add(intercept);
+    }
+
+    public ArrayList<EventIntercept> getEventIntercepts() {
+        return mEventIntercepts;
     }
 
 

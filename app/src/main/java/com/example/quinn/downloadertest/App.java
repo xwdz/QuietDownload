@@ -38,7 +38,7 @@ public class App extends Application {
         QuietConfig.getImpl()
                 .initDownloadFile(this)
                 .setMaxDownloadTasks(5)
-                .setRecoverDownloadWhenStart(true)
+                .setMaxRetryCount(3)
                 .setHandlerNetworkListener(new QuietConfig.HandlerNetworkListener() {
             @Override
             public boolean onHandlerNetworkStatus() {

@@ -55,7 +55,7 @@ class DataChanger extends Observable {
     }
 
 
-    public void postStatus(DownloadEntry downloadEntry) {
+    public void postNotifyStatus(DownloadEntry downloadEntry) {
         checkContext(mContext);
 
         mOperatedEntries.put(downloadEntry.id, downloadEntry);

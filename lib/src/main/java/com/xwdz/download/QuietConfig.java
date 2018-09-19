@@ -125,7 +125,15 @@ public class QuietConfig {
     }
 
     public File getDownloadFile(String url) {
-        return new File(mDownloadDir, FileUtils.getMd5FileName(url));
+        return new File(mDownloadDir, FileUtils.getMd5FileName(checkUrlLength(url)));
+    }
+
+    private String checkUrlLength(String url) {
+        if (url.length() > 24) {
+            return url.substring(0, 24);
+        } else {
+            return url;
+        }
     }
 
     public void setEventIntercepts(ArrayList<EventIntercept> list) {

@@ -226,6 +226,9 @@ public class DownloadEntry implements Serializable {
 
 ## 版本历史
 
+### v0.0.5
+  - 修复默认使用url作为文件名称url长度过长问题    
+
 ### v0.0.4
   - 新增DownloadStatus连接成功`CONNECT_SUCCESSFUL`枚举
 

@@ -49,7 +49,6 @@ public class DownloadThread implements Runnable {
     private volatile boolean isError;
     private volatile boolean isCompleted;
 
-    private int mRetryCountIndex = 0;
 
     public DownloadThread(String url, File destFile, int threadIndex, int startPos, int endPos, DownloadListener listener) {
         this.mUrl = url;
@@ -65,28 +64,10 @@ public class DownloadThread implements Runnable {
     public void run() {
         //todo not impl retry
         realRun();
-//        final int retryCount = QuietConfig.getConfig().getMaxRetryCount();
-//        for (int i = 0; i < retryCount; i++) {
-//            if (mRetryCountIndex == retryCount && !isError) {
-//                Logger.d(TAG, "current retryCount:" + mRetryCountIndex + " setRetryCount:" + retryCount);
-//                break;
-//            }
-//
-//            if (!isCompleted) {
-//                boolean isError = realRun();
-//                if (isError) {
-//                    mRetryCountIndex++;
-//                    Logger.d(TAG, "retry count(" + mRetryCountIndex + ")" + "max retryCount:" + retryCount);
-//                    realRun();
-//                } else {
-//                    break;
-//                }
-//            }
-//        }
     }
 
 
-    private boolean realRun() {
+    private void realRun() {
         mStatus = DownloadEntry.DownloadStatus.DOWNLOADING;
         HttpURLConnection connection = null;
         try {
@@ -108,6 +89,7 @@ public class DownloadThread implements Runnable {
                     is = connection.getInputStream();
                     byte[] buffer = new byte[BUFF_SIZE];
                     int len = -1;
+
                     while ((len = is.read(buffer)) != -1) {
                         raf.write(buffer, 0, len);
                         mListener.onProgressChanged(mThreadIndex, len);
@@ -115,7 +97,7 @@ public class DownloadThread implements Runnable {
                             break;
                         }
                     }
-                    return true;
+
                 } finally {
                     if (raf != null) {
                         raf.close();
@@ -130,14 +112,16 @@ public class DownloadThread implements Runnable {
                     is = connection.getInputStream();
                     byte[] buffer = new byte[BUFF_SIZE];
                     int len = -1;
+
                     while ((len = is.read(buffer)) != -1) {
                         fos.write(buffer, 0, len);
                         mListener.onProgressChanged(mThreadIndex, len);
                         if (isPaused || isCancelled || isError) {
                             break;
                         }
+
                     }
-                    return true;
+
                 } finally {
                     if (fos != null) {
                         fos.close();
@@ -164,7 +148,6 @@ public class DownloadThread implements Runnable {
                 mListener.onDownloadError(mThreadIndex, e.getMessage());
             }
 
-            return false;
         } finally {
             if (connection != null) {
                 connection.disconnect();
@@ -178,13 +161,12 @@ public class DownloadThread implements Runnable {
                 mListener.onDownloadCancelled(mThreadIndex);
             } else if (isError) {
                 mStatus = DownloadEntry.DownloadStatus.ERROR;
-                mListener.onDownloadError(mThreadIndex, "cancel manually by ERROR");
+                mListener.onDownloadError(mThreadIndex, "error");
             } else {
                 mStatus = DownloadEntry.DownloadStatus.COMPLETED;
                 mListener.onDownloadCompleted(mThreadIndex);
             }
         }
-        return false;
     }
 
 

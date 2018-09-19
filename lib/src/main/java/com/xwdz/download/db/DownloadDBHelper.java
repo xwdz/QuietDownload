@@ -29,7 +29,7 @@ import java.sql.SQLException;
 public class DownloadDBHelper extends OrmLiteSqliteOpenHelper{
 	
 	public static final String DB_NAME = "xwdz_downloader";
-	public static final int DB_VERSION = 1;
+	public static final int DB_VERSION = 2;
 
 	public DownloadDBHelper(Context context, String databaseName, CursorFactory factory, int databaseVersion) {
 		super(context, DB_NAME, factory, DB_VERSION);

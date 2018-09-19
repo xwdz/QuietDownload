@@ -102,7 +102,7 @@ public class QuietDownloader {
     }
 
     /**
-     *  恢复一个任务
+     * 恢复一个任务
      */
     public void resume(DownloadEntry downloadEntry) {
         if (!checkIfExecutable()) {
@@ -129,7 +129,7 @@ public class QuietDownloader {
     }
 
     /**
-     *  暂停队列所有任务
+     * 暂停队列所有任务
      */
     public void pauseAll() {
         if (!checkIfExecutable()) {
@@ -155,6 +155,7 @@ public class QuietDownloader {
 
     /**
      * 添加一个数据接收器
+     *
      * @see DataUpdatedWatcher
      */
     public void addObserver(DataUpdatedWatcher watcher) {
@@ -163,6 +164,7 @@ public class QuietDownloader {
 
     /**
      * 删除一个数据接收器
+     *
      * @see DataUpdatedWatcher
      */
     public void removeObserver(DataUpdatedWatcher watcher) {
@@ -171,6 +173,7 @@ public class QuietDownloader {
 
     /**
      * 查询一个任务从数据库中
+     *
      * @param id by DownloadEntry
      */
     public DownloadEntry queryDownloadEntry(String id) {
@@ -183,6 +186,7 @@ public class QuietDownloader {
 
     /**
      * 删除一个任务从数据库中
+     *
      * @param forceDelete
      * @param id
      */

@@ -150,13 +150,18 @@ public class DownloadTaskManager implements ConnectThread.ConnectListener, Downl
 
     private void notifyUpdate(DownloadEntry downloadEntry, int what) {
         Logger.e(TAG, "notifyUpdate:" + what + ":" + downloadEntry.currentLength);
-        if (mHandler.hasMessages(what)) {
-            mHandler.removeMessages(what);
-        }
+//        if (mHandler.hasMessages(what)) {
+//            mHandler.removeMessages(what);
+//        }
         Message msg = mHandler.obtainMessage();
         msg.what = what;
         msg.obj = downloadEntry;
         mHandler.sendMessage(msg);
+        try {
+            Thread.sleep(10);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

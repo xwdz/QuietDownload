@@ -29,7 +29,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.xwdz.download.core.QuietDownloader;
-import com.xwdz.download.db.DownloadEntry;
+import com.xwdz.download.core.DownloadEntry;
 import com.xwdz.download.notify.DataUpdatedWatcher;
 
 import java.util.ArrayList;
@@ -75,7 +75,7 @@ public class ListActivity extends AppCompatActivity {
         DownloadEntry realEntry = null;
         for (int i = 0; i < mDownloadEntries.size(); i++) {
             entry = mDownloadEntries.get(i);
-            realEntry = mQuietDownloader.queryDownloadEntry(entry.id);
+            realEntry = mQuietDownloader.queryById(entry.id);
             if (realEntry != null) {
                 mDownloadEntries.remove(i);
                 mDownloadEntries.add(i, realEntry);

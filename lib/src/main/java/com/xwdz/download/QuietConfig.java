@@ -124,8 +124,8 @@ public class QuietConfig {
         return this;
     }
 
-    public File getDownloadFile(String url) {
-        return new File(mDownloadDir, FileUtils.getMd5FileName(checkUrlLength(url)));
+    public File getDownloadFile(String name) {
+        return new File(mDownloadDir, FileUtils.getMd5FileName(checkUrlLength(name)));
     }
 
     private String checkUrlLength(String url) {

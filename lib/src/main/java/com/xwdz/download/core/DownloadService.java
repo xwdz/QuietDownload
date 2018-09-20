@@ -25,8 +25,6 @@ import android.os.Message;
 import android.util.ArrayMap;
 
 import com.xwdz.download.QuietConfig;
-import com.xwdz.download.db.DBController;
-import com.xwdz.download.db.DownloadEntry;
 import com.xwdz.download.utils.Constants;
 import com.xwdz.download.utils.Logger;
 
@@ -73,7 +71,7 @@ public class DownloadService extends Service {
         }
     });
 
-    private DBController mDBController;
+    private DownloadDBManager mDownloadDBManager;
 
     private void checkNext(DownloadEntry obj) {
         mDownloadingTasks.remove(obj.id);
@@ -96,18 +94,18 @@ public class DownloadService extends Service {
         mExecutors = Executors.newCachedThreadPool();
         mDataChanger = DataChanger.getImpl();
         mDataChanger.initContext(this);
-        mDBController = DBController.getInstance(getApplicationContext());
+        mDownloadDBManager = DownloadDBManager.getImpl();
         initDownload();
     }
 
     private void initDownload() {
-        ArrayList<DownloadEntry> downloadEntrys = mDBController.queryAll();
+        ArrayList<DownloadEntry> downloadEntrys = mDownloadDBManager.queryAll();
         if (downloadEntrys != null) {
             for (DownloadEntry downloadEntry : downloadEntrys) {
 
                 if (downloadEntry.status == DownloadEntry.DownloadStatus.PAUSED) {
                     // todo 暂停的自动赋值恢复进度
-                    Logger.d(TAG,"auto recover");
+                    Logger.d(TAG, "auto recover");
 //                    addDownload(downloadEntry);
                 }
 
@@ -128,7 +126,7 @@ public class DownloadService extends Service {
                             downloadEntry.status = DownloadEntry.DownloadStatus.IDLE;
                             downloadEntry.reset();
                         }
-                        mDBController.newOrUpdate(downloadEntry);
+                        mDownloadDBManager.newOrUpdate(downloadEntry);
                     }
                 }
                 mDataChanger.addToOperatedEntryMap(downloadEntry.id, downloadEntry);

@@ -19,16 +19,18 @@ package com.xwdz.download.core;
 import android.content.Context;
 import android.content.Intent;
 
+import com.j256.ormlite.dao.Dao;
 import com.xwdz.download.QuietConfig;
-import com.xwdz.download.db.DownloadEntry;
 import com.xwdz.download.notify.DataUpdatedWatcher;
 import com.xwdz.download.utils.Constants;
 import com.xwdz.download.utils.Logger;
 
 import java.io.File;
+import java.sql.SQLException;
+import java.util.ArrayList;
 
 /**
- * @author xwdz(xwdz9989@gmail.com)
+ * @author huangxingwei(xwdz9989@gmail.com)
  */
 public class QuietDownloader {
 
@@ -55,7 +57,8 @@ public class QuietDownloader {
     public void bindService(Context context) {
         mInit = true;
         mContext = context;
-        mDataChanger.initContext(mContext);
+        mDataChanger.initContext(context);
+        DownloadDBManager.getImpl().initDBHelper(context);
         context.getApplicationContext().startService(new Intent(context, DownloadService.class));
     }
 
@@ -176,12 +179,21 @@ public class QuietDownloader {
      *
      * @param id by DownloadEntry
      */
-    public DownloadEntry queryDownloadEntry(String id) {
+    public DownloadEntry queryById(String id) {
         return mDataChanger.queryDownloadEntryById(id);
     }
 
     public boolean containsDownloadEntry(String id) {
         return mDataChanger.containsDownloadEntry(id);
+    }
+
+
+    public Dao<DownloadEntry, String> getDBDao() throws SQLException {
+        return DownloadDBManager.getImpl().getDao();
+    }
+
+    public ArrayList<DownloadEntry> queryAll() {
+        return DownloadDBManager.getImpl().queryAll();
     }
 
     /**

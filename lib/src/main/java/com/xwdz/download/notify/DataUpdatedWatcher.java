@@ -17,7 +17,7 @@
 package com.xwdz.download.notify;
 
 
-import com.xwdz.download.db.DownloadEntry;
+import com.xwdz.download.core.DownloadEntry;
 
 import java.util.Observable;
 import java.util.Observer;

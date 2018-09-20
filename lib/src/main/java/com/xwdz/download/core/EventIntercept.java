@@ -16,8 +16,6 @@
 
 package com.xwdz.download.core;
 
-import com.xwdz.download.db.DownloadEntry;
-
 /**
  * 拦截器会在如下流程中执行 onIntnercept 方法
  *

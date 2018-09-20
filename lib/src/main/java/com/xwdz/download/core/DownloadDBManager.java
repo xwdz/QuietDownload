@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package com.xwdz.download.db;
+package com.xwdz.download.core;
 
 import android.content.Context;
 
@@ -26,24 +26,28 @@ import java.util.ArrayList;
 
 
 /**
- * @author xwdz(xwdz9989@gmail.com)
+ * @author huangxingwei (xwdz9989@gamil.com)
+ * @since 2018/9/20
  */
-public class DBController {
+class DownloadDBManager {
 
-    private static final String TAG = DBController.class.getSimpleName();
+    private static final String TAG = DownloadDBManager.class.getSimpleName();
 
-    private static DBController instance;
+    private static DownloadDBManager instance;
     private DownloadDBHelper mDBHelper;
 
-    private DBController(Context context) {
-        mDBHelper = new DownloadDBHelper(context);
+    private DownloadDBManager() {
     }
 
-    public static DBController getInstance(Context context) {
+    public static DownloadDBManager getImpl() {
         if (instance == null) {
-            instance = new DBController(context);
+            instance = new DownloadDBManager();
         }
         return instance;
+    }
+
+    public void initDBHelper(Context context) {
+        mDBHelper = new DownloadDBHelper(context.getApplicationContext());
     }
 
     public synchronized void newOrUpdate(DownloadEntry downloadEntry) {
@@ -61,7 +65,7 @@ public class DBController {
             dao = mDBHelper.getDao(DownloadEntry.class);
             return (ArrayList<DownloadEntry>) dao.query(dao.queryBuilder().prepare());
         } catch (SQLException e) {
-            Logger.e(TAG,e.getMessage());
+            Logger.e(TAG, e.getMessage());
             return null;
         }
     }
@@ -71,9 +75,13 @@ public class DBController {
             Dao<DownloadEntry, String> dao = mDBHelper.getDao(DownloadEntry.class);
             return dao.queryForId(id);
         } catch (SQLException e) {
-            Logger.e(TAG,e.getMessage());
+            Logger.e(TAG, e.getMessage());
             return null;
         }
+    }
+
+    public Dao<DownloadEntry, String> getDao() throws SQLException {
+        return mDBHelper.getDao(DownloadEntry.class);
     }
 
     public void deleteById(String id) {

@@ -17,7 +17,7 @@
 package com.example.quinn.downloadertest;
 
 
-import com.xwdz.download.db.DownloadEntry;
+import com.xwdz.download.core.DownloadEntry;
 
 import java.io.Serializable;
 

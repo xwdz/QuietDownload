@@ -20,7 +20,6 @@ import android.os.Handler;
 import android.os.Message;
 
 import com.xwdz.download.QuietConfig;
-import com.xwdz.download.db.DownloadEntry;
 import com.xwdz.download.utils.Logger;
 import com.xwdz.download.utils.TickTack;
 
@@ -52,7 +51,7 @@ public class DownloadTaskManager implements ConnectThread.ConnectListener, Downl
         this.mDownloadEntry = downloadEntry;
         this.mHandler = handler;
         this.mExecutor = mExecutor;
-        this.mDestFile = QuietConfig.getImpl().getDownloadFile(downloadEntry.url);
+        this.mDestFile = QuietConfig.getImpl().getDownloadFile(downloadEntry.name);
     }
 
     public void pause() {
@@ -150,18 +149,13 @@ public class DownloadTaskManager implements ConnectThread.ConnectListener, Downl
 
     private void notifyUpdate(DownloadEntry downloadEntry, int what) {
         Logger.e(TAG, "notifyUpdate:" + what + ":" + downloadEntry.currentLength);
-//        if (mHandler.hasMessages(what)) {
-//            mHandler.removeMessages(what);
-//        }
+        if (mHandler.hasMessages(what)) {
+            mHandler.removeMessages(what);
+        }
         Message msg = mHandler.obtainMessage();
         msg.what = what;
         msg.obj = downloadEntry;
         mHandler.sendMessage(msg);
-        try {
-            Thread.sleep(10);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
     }
 
     @Override

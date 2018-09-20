@@ -95,28 +95,18 @@ implementation 'com.xwdz:QuietDownloader:$lastVersion'
      
 #### DownloadEntry的几种状态
 
-```
- public enum DownloadStatus {
-        //空闲
-        IDLE,
-        // 等待
-        WAITING,
-        // 连接 获取下载信息
-        CONNECTING,
-        // 连接成功 即获取到下载文件大小等
-        CONNECT_SUCCESSFUL,
-        // 开始下载
-        DOWNLOADING,
-        // 暂停
-        PAUSED,
-        // 取消
-        CANCELLED,
-        // 完成
-        COMPLETED,
-        // 错误
-        ERROR
-    }
-```
+|状态|说明|
+|:---|:---|
+|`IDLE`|空闲|
+|`WAITING`|等待|
+|`CONNECTING`|连接|
+|`CONNECT_SUCCESSFUL`|连接成功|
+|`DOWNLOADING`|开始下载|
+|`PAUSED`|暂停|
+|`CANCELLED`|取消|
+|`COMPLETED`|完成|
+|`ERROR`|发生错误|
+
                         
 #### 使用方法
 
@@ -127,24 +117,25 @@ private final DownloadEntry downloadEntry = new DownloadEntry("url");
 
   ... 省略代码
   
-  // 常用API
-  // 开始任务
-  mDownloader.startDownad(downloadEntry);
-  // 暂停任务
-  mDownloader.pause(downloadEntry);
-  //取消任务
-  mDownloader.cancel(downloadEntry);
-  // 恢复任务
-  mDownloader.resume(downloadEntry);
-  // 恢复所有
-  mDownloader.recoverAll(downloadEntry);
-  // 暂停所有
-  mDownloader.pauseAll(downloadEntry);
-  
 ```
+
+
+|常用Api|参数|说明|
+|:---|:---|:---|
+|`download`|downloadEntry|下载一个任务|
+|`pause`|downloadEntry|在听一个任务|
+|`cancel`|downloadEntry|取消一个任务|
+|`resume`|downloadEntry|恢复一个下载任务|
+|`recoverAll`|无|恢复所有下载任务|
+|`pauseAll`|无|暂停所有任务|
+|`queryAll`|无|查询所有下载任务返回一个list|
+|`getDBDao`|无|返回`Dao<DownloadEntry, String>`自定义进行数据查询|
+
+......
+  
+  
      
-     
-#### 关于监听
+#### 监听
 
 `QuiteDownload` 并没有采用传统listener方式，而是使用了观察者模式,如需要在某个界面监听下载进度
 
@@ -190,12 +181,23 @@ public class DownloadEntry implements Serializable {
         // ... 省略代码
 
     public DownloadEntry(String url) {
-        this.url = url;
-        this.id = url;
-        this.name = url.substring(url.lastIndexOf("/") + 1);
+           this.url = url;
+           this.id = url;
+           this.name = url.substring(url.lastIndexOf("/") + 1);
     }
-
+   
+    public DownloadEntry(String url, String name) {
+           this.url = url;
+           this.id = url;
+           this.name = name;
     }
+   
+    public DownloadEntry(String url, String id, String name) {
+           this.url = url;
+           this.id = id;
+           this.name = name;
+     }
+       
     // ... 省略代码
     
     @Override
@@ -215,8 +217,9 @@ public class DownloadEntry implements Serializable {
 ```
 
 #### 注意
-- DownloadEntry实体类重写其 equals 以及 hashCode 方法，使用其 id hashCode 来作为其标准
-- QuietDownloader内部使用DownloadEntry实体类进行关联
+- `DownloadEntry` 实体类重写其 equals 以及 hashCode 方法，使用其 id hashCode 来作为其标准
+- `QuietDownloader` 内部使用DownloadEntry实体类进行关联
+- `QuietDownEntry`的`name`属性最终作为下载文件名称  
 
 
 
@@ -225,6 +228,10 @@ public class DownloadEntry implements Serializable {
  - 拦截器实现
 
 ## 版本历史
+
+### v0.0.6
+  - `QuietDownloader` 可通过`getDBDao()`拿到`Dao<DownloadEntry, String>`对象操作数据库
+  - `QuietDownloader` 提供查询所有方法数据库DownloadEntry `queryAll()`
 
 ### v0.0.5
   - 修复默认使用url作为文件名称url长度过长问题    

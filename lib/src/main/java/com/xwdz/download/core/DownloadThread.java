@@ -16,7 +16,6 @@
 
 package com.xwdz.download.core;
 
-import com.xwdz.download.db.DownloadEntry;
 import com.xwdz.download.utils.Constants;
 
 import java.io.File;

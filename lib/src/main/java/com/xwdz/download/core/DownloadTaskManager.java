@@ -52,6 +52,7 @@ public class DownloadTaskManager implements ConnectThread.ConnectListener, Downl
         this.mHandler = handler;
         this.mExecutor = mExecutor;
         this.mDestFile = QuietConfig.getImpl().getDownloadFile(downloadEntry.name);
+        Logger.d(TAG, "mDestFile:" + mDestFile.getAbsolutePath());
     }
 
     public void pause() {

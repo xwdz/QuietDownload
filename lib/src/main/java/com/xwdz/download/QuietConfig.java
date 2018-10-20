@@ -20,7 +20,6 @@ import android.content.Context;
 import android.os.Environment;
 
 import com.xwdz.download.core.EventIntercept;
-import com.xwdz.download.utils.FileUtils;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -125,7 +124,7 @@ public class QuietConfig {
     }
 
     public File getDownloadFile(String name) {
-        return new File(mDownloadDir, FileUtils.getMd5FileName(name));
+        return new File(mDownloadDir, name);
     }
 
     public void setEventIntercepts(ArrayList<EventIntercept> list) {

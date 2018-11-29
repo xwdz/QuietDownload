@@ -175,13 +175,6 @@ public class QuietDownloader {
     }
 
     /**
-     * 查询一个任务从数据库中
-     */
-    public DownloadEntry queryById(String id) {
-        return mDataChanger.queryDownloadEntryById(id);
-    }
-
-    /**
      * @return 获取操作数据库Dao对象
      */
     public Dao<DownloadEntry, String> getDBDao() throws SQLException {
@@ -216,7 +209,7 @@ public class QuietDownloader {
      *
      * @return DownloadEntry == null
      */
-    public DownloadEntry queryDownloadEntryForQueue(String id) {
+    public DownloadEntry queryEntryByIdForQueue(String id) {
         return mDataChanger.queryDownloadEntryForQueue(id);
     }
 }

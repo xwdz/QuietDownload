@@ -229,7 +229,7 @@ public class DownloadEntry implements Serializable {
 
 ## 版本历史
 
-### v0.0.5
+### v1.0.0
   - `QuietConigs` 提供自定义下载目录
   - [Fix Issues3](https://github.com/xwdz/QuietDownload/issues/3)
 

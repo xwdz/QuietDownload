@@ -231,7 +231,7 @@ public class DownloadEntry implements Serializable {
 
 ### v1.0.0
   - `QuietConigs`提供自定义下载目录
-  - `QuietDownloader` 新增`queryEntryForQueue()`Api
+  - `QuietDownloader` 新增`queryEntryByIdForQueue()`Api
   - [Fix Issues3](https://github.com/xwdz/QuietDownload/issues/3)
 
 ### v0.0.6

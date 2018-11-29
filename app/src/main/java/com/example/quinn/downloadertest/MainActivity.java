@@ -7,7 +7,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.xwdz.download.core.QuietDownloader;
-import com.xwdz.download.db.DownloadEntry;
+import com.xwdz.download.core.DownloadEntry;
 import com.xwdz.download.notify.DataUpdatedWatcher;
 
 public class MainActivity extends AppCompatActivity {

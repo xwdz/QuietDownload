@@ -18,9 +18,6 @@ package com.xwdz.download.core;
 
 import android.content.Context;
 
-import com.xwdz.download.db.DBController;
-import com.xwdz.download.db.DownloadEntry;
-
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -31,7 +28,6 @@ import java.util.Observable;
  * @author xwdz(xwdz9989@gmail.com)
  */
 class DataChanger extends Observable {
-
 
     private static class HolderClass {
         private static final DataChanger INSTANCE = new DataChanger();
@@ -59,7 +55,7 @@ class DataChanger extends Observable {
         checkContext(mContext);
 
         mOperatedEntries.put(downloadEntry.id, downloadEntry);
-        DBController.getInstance(mContext).newOrUpdate(downloadEntry);
+        DownloadDBManager.getImpl().newOrUpdate(downloadEntry);
         setChanged();
         notifyObservers(downloadEntry);
     }
@@ -81,19 +77,24 @@ class DataChanger extends Observable {
         return mOperatedEntries.get(id);
     }
 
+
     public void addToOperatedEntryMap(String key, DownloadEntry value) {
         mOperatedEntries.put(key, value);
     }
 
+    public DownloadEntry queryDownloadEntryForQueue(String id) {
+        return mOperatedEntries.get(id);
+    }
+
     public boolean containsDownloadEntry(String id) {
-        return mOperatedEntries.containsKey(id);
+        return mOperatedEntries.containsValue(id);
     }
 
     public void deleteDownloadEntry(String id) {
         checkContext(mContext);
 
         mOperatedEntries.remove(id);
-        DBController.getInstance(mContext).deleteById(id);
+        DownloadDBManager.getImpl().deleteById(id);
     }
 
 

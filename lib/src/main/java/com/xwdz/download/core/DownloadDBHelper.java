@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package com.xwdz.download.db;
+package com.xwdz.download.core;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
@@ -26,30 +26,30 @@ import com.j256.ormlite.table.TableUtils;
 
 import java.sql.SQLException;
 
-public class DownloadDBHelper extends OrmLiteSqliteOpenHelper{
-	
-	public static final String DB_NAME = "xwdz_downloader";
-	public static final int DB_VERSION = 2;
+class DownloadDBHelper extends OrmLiteSqliteOpenHelper {
 
-	public DownloadDBHelper(Context context, String databaseName, CursorFactory factory, int databaseVersion) {
-		super(context, DB_NAME, factory, DB_VERSION);
-	}
+    public static final String DB_NAME = "xwdz_downloader";
+    public static final int DB_VERSION = 2;
 
-	public DownloadDBHelper(Context context) {
-		super(context, DB_NAME, null, DB_VERSION);
-	}
+    public DownloadDBHelper(Context context, String databaseName, CursorFactory factory, int databaseVersion) {
+        super(context, DB_NAME, factory, DB_VERSION);
+    }
 
-	@Override
-	public void onCreate(SQLiteDatabase database, ConnectionSource connectionSource) {
-		try {
-			TableUtils.createTable(connectionSource, DownloadEntry.class);
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-	}
+    public DownloadDBHelper(Context context) {
+        super(context, DB_NAME, null, DB_VERSION);
+    }
 
-	@Override
-	public void onUpgrade(SQLiteDatabase database, ConnectionSource connectionSource, int arg2, int arg3) {
-	}
+    @Override
+    public void onCreate(SQLiteDatabase database, ConnectionSource connectionSource) {
+        try {
+            TableUtils.createTable(connectionSource, DownloadEntry.class);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onUpgrade(SQLiteDatabase database, ConnectionSource connectionSource, int arg2, int arg3) {
+    }
 
 }

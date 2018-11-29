@@ -18,7 +18,7 @@ package com.example.quinn.downloadertest;
 
 import android.app.Application;
 
-import com.xwdz.download.QuietConfig;
+import com.xwdz.download.QuietConfigs;
 import com.xwdz.download.core.QuietDownloader;
 
 /**
@@ -35,11 +35,11 @@ public class App extends Application {
 
         QuietDownloader.getImpl().bindService(this);
 
-        QuietConfig.getImpl()
+        QuietConfigs.getImpl()
                 .initDownloadFile(this)
                 .setMaxDownloadTasks(5)
                 .setMaxRetryCount(3)
-                .setHandlerNetworkListener(new QuietConfig.HandlerNetworkListener() {
+                .setHandlerNetworkListener(new QuietConfigs.HandlerNetworkListener() {
             @Override
             public boolean onHandlerNetworkStatus() {
                 return false;

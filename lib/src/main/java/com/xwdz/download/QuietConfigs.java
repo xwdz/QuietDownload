@@ -20,15 +20,14 @@ import android.content.Context;
 import android.os.Environment;
 
 import com.xwdz.download.core.EventIntercept;
-import com.xwdz.download.utils.FileUtils;
 
 import java.io.File;
 import java.util.ArrayList;
 
 /**
- * @author xwdz(xwdz9989@gmail.com)
+ * @author 黄兴伟 (xwdz9989@gamil.com)
  */
-public class QuietConfig {
+public class QuietConfigs {
 
     public boolean isDebug = true;
 
@@ -40,25 +39,31 @@ public class QuietConfig {
 
     private final ArrayList<EventIntercept> mEventIntercepts = new ArrayList<>();
 
-
     //  todo: no imp
     // todo 处理 jar 包重复问题
     private int mMaxRetryCount = 2;
 
-
-    private QuietConfig() {
+    private QuietConfigs() {
     }
 
     private static class HolderClass {
-        private static final QuietConfig INSTANCE = new QuietConfig();
+        private static final QuietConfigs INSTANCE = new QuietConfigs();
     }
 
-    public synchronized static QuietConfig getImpl() {
+    public synchronized static QuietConfigs getImpl() {
         return HolderClass.INSTANCE;
     }
 
-    public QuietConfig initDownloadFile(Context context) {
-        mDownloadDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath() + File.separator + context.getPackageName());
+    public QuietConfigs initDownloadFile(Context context) {
+        mDownloadDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath()
+                + File.separator + context.getPackageName());
+        initDownloadFile(mDownloadDir);
+        return this;
+    }
+
+
+    public QuietConfigs initDownloadFile(File file) {
+        mDownloadDir = file;
         if (!mDownloadDir.exists()) {
             mDownloadDir.mkdir();
         }
@@ -69,7 +74,7 @@ public class QuietConfig {
         return mMaxDownloadTasks;
     }
 
-    public QuietConfig setMaxDownloadTasks(int maxDownloadTasks) {
+    public QuietConfigs setMaxDownloadTasks(int maxDownloadTasks) {
         this.mMaxDownloadTasks = maxDownloadTasks;
         return this;
     }
@@ -78,7 +83,7 @@ public class QuietConfig {
         return mMaxDownloadThreads;
     }
 
-    public QuietConfig setMaxDownloadThreads(int maxDownloadThreads) {
+    public QuietConfigs setMaxDownloadThreads(int maxDownloadThreads) {
         this.mMaxDownloadThreads = maxDownloadThreads;
         return this;
     }
@@ -87,12 +92,12 @@ public class QuietConfig {
         return mDownloadDir;
     }
 
-    public QuietConfig setDownloadDir(File downloadDir) {
+    public QuietConfigs setDownloadDir(File downloadDir) {
         this.mDownloadDir = downloadDir;
         return this;
     }
 
-    public QuietConfig setDebug(boolean debug) {
+    public QuietConfigs setDebug(boolean debug) {
         isDebug = debug;
         return this;
     }
@@ -101,7 +106,7 @@ public class QuietConfig {
         return mMinOperateInterval;
     }
 
-    public QuietConfig setMinOperateInterval(int minOperateInterval) {
+    public QuietConfigs setMinOperateInterval(int minOperateInterval) {
         this.mMinOperateInterval = minOperateInterval;
         return this;
     }
@@ -110,7 +115,7 @@ public class QuietConfig {
         return mRecoverDownloadWhenStart;
     }
 
-    public QuietConfig setRecoverDownloadWhenStart(boolean recoverDownloadWhenStart) {
+    public QuietConfigs setRecoverDownloadWhenStart(boolean recoverDownloadWhenStart) {
         this.mRecoverDownloadWhenStart = recoverDownloadWhenStart;
         return this;
     }
@@ -119,13 +124,13 @@ public class QuietConfig {
         return mMaxRetryCount;
     }
 
-    public QuietConfig setMaxRetryCount(int maxRetryCount) {
+    public QuietConfigs setMaxRetryCount(int maxRetryCount) {
         this.mMaxRetryCount = maxRetryCount;
         return this;
     }
 
-    public File getDownloadFile(String url) {
-        return new File(mDownloadDir, FileUtils.getMd5FileName(url));
+    public File getDownloadFile(String name) {
+        return new File(mDownloadDir, name);
     }
 
     public void setEventIntercepts(ArrayList<EventIntercept> list) {
@@ -150,7 +155,7 @@ public class QuietConfig {
     /**
      * @see HandlerNetworkListener 处理网络情况
      */
-    public QuietConfig setHandlerNetworkListener(HandlerNetworkListener handlerNetworkListenerListener) {
+    public QuietConfigs setHandlerNetworkListener(HandlerNetworkListener handlerNetworkListenerListener) {
         this.mHandlerNetworkListener = handlerNetworkListenerListener;
         return this;
     }

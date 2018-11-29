@@ -16,7 +16,6 @@
 
 package com.xwdz.download.core;
 
-import com.xwdz.download.db.DownloadEntry;
 import com.xwdz.download.utils.Constants;
 
 import java.io.File;
@@ -27,7 +26,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 /**
- * @author xwdz(xwdz9989@gmail.com)
+ * @author 黄兴伟 (xwdz9989@gamil.com)
  */
 public class DownloadThread implements Runnable {
 

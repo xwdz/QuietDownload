@@ -25,7 +25,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.xwdz.download.core.QuietDownloader;
-import com.xwdz.download.db.DownloadEntry;
+import com.xwdz.download.core.DownloadEntry;
 import com.xwdz.download.notify.DataUpdatedWatcher;
 
 public class AppDetailActivity extends AppCompatActivity {
@@ -56,7 +56,7 @@ public class AppDetailActivity extends AppCompatActivity {
 
         mAppEntry = (AppEntry) getIntent().getSerializableExtra("url");
         mDownloadManager = QuietDownloader.getImpl();
-        entry = mDownloadManager.containsDownloadEntry(mAppEntry.url) ? mDownloadManager.queryDownloadEntry(mAppEntry.url) : mAppEntry.generateDownloadEntry();
+        entry = mDownloadManager.containsDownloadEntry(mAppEntry.url) ? mDownloadManager.queryById(mAppEntry.url) : mAppEntry.generateDownloadEntry();
 
         initializeData();
     }

@@ -82,7 +82,7 @@ class DataChanger extends Observable {
         mOperatedEntries.put(key, value);
     }
 
-    public DownloadEntry getDownloadEntryForQueue(String id) {
+    public DownloadEntry queryDownloadEntryForQueue(String id) {
         return mOperatedEntries.get(id);
     }
 

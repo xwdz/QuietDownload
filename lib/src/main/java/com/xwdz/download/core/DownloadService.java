@@ -203,7 +203,7 @@ public class DownloadService extends Service {
     }
 
     private void addDownload(DownloadEntry downloadEntry) {
-        final DownloadEntry memoryEntry = mDataChanger.getDownloadEntryForQueue(downloadEntry.id);
+        final DownloadEntry memoryEntry = mDataChanger.queryDownloadEntryForQueue(downloadEntry.id);
         if (memoryEntry != null) {
             if (memoryEntry.status == DownloadEntry.DownloadStatus.DOWNLOADING) {
                 LOG.w(TAG, "entry:" + downloadEntry + " already downloading..");

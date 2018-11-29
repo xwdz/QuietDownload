@@ -24,9 +24,9 @@ import android.os.IBinder;
 import android.os.Message;
 import android.util.ArrayMap;
 
-import com.xwdz.download.QuietConfig;
+import com.xwdz.download.QuietConfigs;
 import com.xwdz.download.utils.Constants;
-import com.xwdz.download.utils.Logger;
+import com.xwdz.download.utils.LOG;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -35,7 +35,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingDeque;
 
 /**
- * @author huangxingwei(xwdz9989@gmail.com)
+ * @author 黄兴伟 (xwdz9989@gamil.com)
  */
 public class DownloadService extends Service {
 
@@ -90,7 +90,7 @@ public class DownloadService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        Logger.d(TAG, "downloader service Create ");
+        LOG.d(TAG, "downloader service Create ");
         mExecutors = Executors.newCachedThreadPool();
         mDataChanger = DataChanger.getImpl();
         mDataChanger.initContext(this);
@@ -105,13 +105,13 @@ public class DownloadService extends Service {
 
                 if (downloadEntry.status == DownloadEntry.DownloadStatus.PAUSED) {
                     // todo 暂停的自动赋值恢复进度
-                    Logger.d(TAG, "auto recover");
+                    LOG.d(TAG, "auto recover");
 //                    addDownload(downloadEntry);
                 }
 
                 if (downloadEntry.status == DownloadEntry.DownloadStatus.DOWNLOADING
                         || downloadEntry.status == DownloadEntry.DownloadStatus.WAITING) {
-                    if (QuietConfig.getImpl().isRecoverDownloadWhenStart()) {
+                    if (QuietConfigs.getImpl().isRecoverDownloadWhenStart()) {
                         if (downloadEntry.isSupportRange) {
                             downloadEntry.status = DownloadEntry.DownloadStatus.PAUSED;
                         } else {
@@ -138,10 +138,10 @@ public class DownloadService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent != null) {
-            Logger.d(TAG, "onStartCommand receiver intent:" + intent);
+            LOG.d(TAG, "onStartCommand receiver intent:" + intent);
             DownloadEntry downloadEntry = (DownloadEntry) intent.getSerializableExtra(Constants.KEY_DOWNLOAD_ENTRY);
             if (downloadEntry == null) {
-                Logger.e(TAG, "onStartCommand receiver downloadEntry is null");
+                LOG.e(TAG, "onStartCommand receiver downloadEntry is null");
                 return START_STICKY;
             }
 
@@ -151,7 +151,7 @@ public class DownloadService extends Service {
             int action = intent.getIntExtra(Constants.KEY_DOWNLOAD_ACTION, -1);
             doAction(action, downloadEntry);
         } else {
-            Logger.d(TAG, "not receiver intent");
+            LOG.d(TAG, "not receiver intent");
         }
         return START_STICKY;
     }
@@ -203,7 +203,15 @@ public class DownloadService extends Service {
     }
 
     private void addDownload(DownloadEntry downloadEntry) {
-        if (mDownloadingTasks.size() >= QuietConfig.getImpl().getMaxDownloadTasks()) {
+        final DownloadEntry memoryEntry = mDataChanger.getDownloadEntryForQueue(downloadEntry.id);
+        if (memoryEntry != null) {
+            if (memoryEntry.status == DownloadEntry.DownloadStatus.DOWNLOADING) {
+                LOG.w(TAG, "entry:" + downloadEntry + " already downloading..");
+                return;
+            }
+        }
+
+        if (mDownloadingTasks.size() >= QuietConfigs.getImpl().getMaxDownloadTasks()) {
             mWaitingQueue.offer(downloadEntry);
             downloadEntry.status = DownloadEntry.DownloadStatus.WAITING;
             mDataChanger.postNotifyStatus(downloadEntry);
@@ -239,7 +247,7 @@ public class DownloadService extends Service {
     }
 
     private void startDownload(DownloadEntry downloadEntry) {
-        ArrayList<EventIntercept> eventIntercepts = QuietConfig.getImpl().getEventIntercepts();
+        ArrayList<EventIntercept> eventIntercepts = QuietConfigs.getImpl().getEventIntercepts();
         if (!eventIntercepts.isEmpty()) {
             for (EventIntercept eventIntercept : eventIntercepts) {
                 boolean result = eventIntercept.onIntnercept(downloadEntry);

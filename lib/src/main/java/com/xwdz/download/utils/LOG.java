@@ -18,15 +18,15 @@ package com.xwdz.download.utils;
 
 import android.util.Log;
 
-import com.xwdz.download.QuietConfig;
+import com.xwdz.download.QuietConfigs;
 
 /**
  * @author xwdz(xwdz9989@gmail.com)
  */
-public class Logger {
+public class LOG {
 
     public static final String TAG = "xwdz_downloader";
-    private static final boolean DEBUG = QuietConfig.getImpl().isDebug;
+    private static final boolean DEBUG = QuietConfigs.getImpl().isDebug;
 
     public static void d(String msg) {
         if (DEBUG)
@@ -42,5 +42,10 @@ public class Logger {
     public static void e(String tag, String msg) {
         if (DEBUG)
             Log.e(TAG, "[" + tag + "] " + msg);
+    }
+
+    public static void w(String tag,String msg) {
+        if (DEBUG)
+            Log.w(TAG, "[" + tag + "] " + msg);
     }
 }

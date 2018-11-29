@@ -19,7 +19,7 @@ package com.xwdz.download.core;
 import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
-import com.xwdz.download.QuietConfig;
+import com.xwdz.download.QuietConfigs;
 
 import java.io.File;
 import java.io.Serializable;
@@ -75,7 +75,7 @@ public class DownloadEntry implements Serializable, Cloneable {
     public void reset() {
         currentLength = 0;
         ranges = null;
-        File file = QuietConfig.getImpl().getDownloadFile(url);
+        File file = QuietConfigs.getImpl().getDownloadFile(url);
         if (file.exists()) {
             file.delete();
         }

@@ -60,7 +60,7 @@ implementation 'com.xwdz:QuietDownloader:$lastVersion'
         QuietConfig.getImpl()
                         // 默认下载路径为[sdcard/Download/包名/xxx.apk]
                         // 若没有自定义下载文件路径,则必须调用该init代码
-                        .initDownloadFile(context)
+                        .initDownloadFile(context) || .initDownloadFile(file) 
                         //debug模式
                         .setDebug(boolean isDebug)
                         //下载文件路径
@@ -228,6 +228,10 @@ public class DownloadEntry implements Serializable {
  - 拦截器实现
 
 ## 版本历史
+
+### v0.0.5
+  - `QuietConigs` 提供自定义下载目录
+  - [Fix Issues3](https://github.com/xwdz/QuietDownload/issues/3)
 
 ### v0.0.6
   - `QuietDownloader` 可通过`getDBDao()`拿到`Dao<DownloadEntry, String>`对象操作数据库

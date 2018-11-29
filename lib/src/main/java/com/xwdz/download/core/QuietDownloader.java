@@ -20,17 +20,17 @@ import android.content.Context;
 import android.content.Intent;
 
 import com.j256.ormlite.dao.Dao;
-import com.xwdz.download.QuietConfig;
+import com.xwdz.download.QuietConfigs;
 import com.xwdz.download.notify.DataUpdatedWatcher;
 import com.xwdz.download.utils.Constants;
-import com.xwdz.download.utils.Logger;
+import com.xwdz.download.utils.LOG;
 
 import java.io.File;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
 /**
- * @author huangxingwei(xwdz9989@gmail.com)
+ * @author 黄兴伟 (xwdz9989@gamil.com)
  */
 public class QuietDownloader {
 
@@ -63,6 +63,21 @@ public class QuietDownloader {
     }
 
     /**
+     * @return 检查事件间隔时间
+     */
+    private boolean checkIfExecutable() {
+        long tmp = System.currentTimeMillis();
+        boolean isMinTimeInterval = tmp - mLastOperatedTime > QuietConfigs.getImpl().getMinOperateInterval();
+        if (isMinTimeInterval && mInit) {
+            mLastOperatedTime = tmp;
+            return true;
+        } else {
+            LOG.e(TAG, "isMinTimeInterval:" + isMinTimeInterval + " mInit:" + mInit);
+        }
+        return false;
+    }
+
+    /**
      * 开始下载一个任务
      */
     public void download(DownloadEntry downloadEntry) {
@@ -74,21 +89,6 @@ public class QuietDownloader {
         intent.putExtra(Constants.KEY_DOWNLOAD_ENTRY, downloadEntry);
         intent.putExtra(Constants.KEY_DOWNLOAD_ACTION, Constants.KEY_DOWNLOAD_ACTION_ADD);
         mContext.startService(intent);
-    }
-
-    /**
-     * @return 检查事件间隔时间
-     */
-    private boolean checkIfExecutable() {
-        long tmp = System.currentTimeMillis();
-        boolean isMinTimeInterval = tmp - mLastOperatedTime > QuietConfig.getImpl().getMinOperateInterval();
-        if (isMinTimeInterval && mInit) {
-            mLastOperatedTime = tmp;
-            return true;
-        } else {
-            Logger.e(TAG, "isMinTimeInterval:" + isMinTimeInterval + " mInit:" + mInit);
-        }
-        return false;
     }
 
     /**
@@ -176,23 +176,22 @@ public class QuietDownloader {
 
     /**
      * 查询一个任务从数据库中
-     *
-     * @param id by DownloadEntry
      */
     public DownloadEntry queryById(String id) {
         return mDataChanger.queryDownloadEntryById(id);
     }
 
-    public boolean containsDownloadEntry(String id) {
-        return mDataChanger.containsDownloadEntry(id);
-    }
-
-
+    /**
+     * @return 获取操作数据库Dao对象
+     */
     public Dao<DownloadEntry, String> getDBDao() throws SQLException {
         return DownloadDBManager.getImpl().getDao();
     }
 
-    public ArrayList<DownloadEntry> queryAll() {
+    /**
+     * 从数据库中查询所有下载任务
+     */
+    public ArrayList<DownloadEntry> queryAllForDB() {
         return DownloadDBManager.getImpl().queryAll();
     }
 
@@ -205,10 +204,19 @@ public class QuietDownloader {
     public void deleteDownloadEntry(boolean forceDelete, String id) {
         mDataChanger.deleteDownloadEntry(id);
         if (forceDelete) {
-            File file = QuietConfig.getImpl().getDownloadFile(id);
+            File file = QuietConfigs.getImpl().getDownloadFile(id);
             if (file.exists())
                 file.delete();
         }
+    }
 
+
+    /**
+     * 查询当前队列中是否有该 DownloadEntry
+     *
+     * @return DownloadEntry == null
+     */
+    public DownloadEntry getDownloadEntryForQueue(String id) {
+        return mDataChanger.getDownloadEntryForQueue(id);
     }
 }

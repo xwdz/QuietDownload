@@ -29,7 +29,6 @@ import java.util.Observable;
  */
 class DataChanger extends Observable {
 
-
     private static class HolderClass {
         private static final DataChanger INSTANCE = new DataChanger();
     }
@@ -83,8 +82,12 @@ class DataChanger extends Observable {
         mOperatedEntries.put(key, value);
     }
 
+    public DownloadEntry getDownloadEntryForQueue(String id) {
+        return mOperatedEntries.get(id);
+    }
+
     public boolean containsDownloadEntry(String id) {
-        return mOperatedEntries.containsKey(id);
+        return mOperatedEntries.containsValue(id);
     }
 
     public void deleteDownloadEntry(String id) {

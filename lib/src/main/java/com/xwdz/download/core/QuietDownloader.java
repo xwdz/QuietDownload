@@ -194,7 +194,7 @@ public class QuietDownloader {
      * @param forceDelete
      * @param id
      */
-    public void deleteDownloadEntry(boolean forceDelete, String id) {
+    public void deleteById(boolean forceDelete, String id) {
         mDataChanger.deleteDownloadEntry(id);
         if (forceDelete) {
             File file = QuietConfigs.getImpl().getDownloadFile(id);
@@ -209,7 +209,7 @@ public class QuietDownloader {
      *
      * @return DownloadEntry == null
      */
-    public DownloadEntry queryEntryByIdForQueue(String id) {
+    public DownloadEntry queryByIdFor(String id) {
         return mDataChanger.queryDownloadEntryForQueue(id);
     }
 }

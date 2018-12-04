@@ -141,7 +141,7 @@ public class DownloadService extends Service {
             LOG.d(TAG, "onStartCommand receiver intent:" + intent);
             DownloadEntry downloadEntry = (DownloadEntry) intent.getSerializableExtra(Constants.KEY_DOWNLOAD_ENTRY);
             if (downloadEntry == null) {
-                LOG.e(TAG, "onStartCommand receiver downloadEntry is null");
+                LOG.w(TAG, "onStartCommand receiver downloadEntry is null");
                 return START_STICKY;
             }
 

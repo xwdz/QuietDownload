@@ -76,7 +76,7 @@ public class ListActivity extends AppCompatActivity {
         DownloadEntry realEntry = null;
         for (int i = 0; i < mDownloadEntries.size(); i++) {
             entry = mDownloadEntries.get(i);
-            realEntry = mQuietDownloader.queryByIdFor(entry.id);
+            realEntry = mQuietDownloader.queryById(entry.id);
             if (realEntry != null) {
                 mDownloadEntries.remove(i);
                 mDownloadEntries.add(i, realEntry);

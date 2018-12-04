@@ -209,7 +209,7 @@ public class QuietDownloader {
      *
      * @return DownloadEntry == null
      */
-    public DownloadEntry queryByIdFor(String id) {
+    public DownloadEntry queryById(String id) {
         return mDataChanger.queryDownloadEntryForQueue(id);
     }
 }

@@ -56,7 +56,7 @@ public class AppDetailActivity extends AppCompatActivity {
 
         mAppEntry = (AppEntry) getIntent().getSerializableExtra("url");
         mDownloadManager = QuietDownloader.getImpl();
-        entry = mDownloadManager.queryByIdFor(mAppEntry.url) == null ? mDownloadManager.queryByIdFor(mAppEntry.url) : mAppEntry.generateDownloadEntry();
+        entry = mDownloadManager.queryById(mAppEntry.url) == null ? mDownloadManager.queryById(mAppEntry.url) : mAppEntry.generateDownloadEntry();
 
         initializeData();
     }

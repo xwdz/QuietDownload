@@ -229,6 +229,9 @@ public class DownloadEntry implements Serializable {
 
 ## 版本历史
 
+### v1.0.3
+  - 新增配置`QuietDownloader.setReadTimeoutMillis()`,`QuietDownloader.setConnTimeMillis`
+
 ### v1.0.2
   - [fix Issues5](https://github.com/xwdz/QuietDownload/issues/5)
 

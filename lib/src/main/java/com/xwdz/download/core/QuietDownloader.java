@@ -62,6 +62,26 @@ public class QuietDownloader {
         context.getApplicationContext().startService(new Intent(context, DownloadService.class));
     }
 
+
+    private int mConnTimeMillis = 30 * 1000;
+    private int mReadTimeoutMillis = 30 * 1000;
+
+    public int getConnTimeMillis() {
+        return mConnTimeMillis;
+    }
+
+    public void setConnTimeMillis(int connTimeMillis) {
+        mConnTimeMillis = connTimeMillis;
+    }
+
+    public int getReadTimeoutMillis() {
+        return mReadTimeoutMillis;
+    }
+
+    public void setReadTimeoutMillis(int readTimeoutMillis) {
+        mReadTimeoutMillis = readTimeoutMillis;
+    }
+
     /**
      * @return 检查事件间隔时间
      */
@@ -184,7 +204,7 @@ public class QuietDownloader {
     /**
      * 从数据库中查询所有下载任务
      */
-    public ArrayList<DownloadEntry> queryAllForDB() {
+    public ArrayList<DownloadEntry> queryAll() {
         return DownloadDBManager.getImpl().queryAll();
     }
 
@@ -207,7 +227,7 @@ public class QuietDownloader {
     /**
      * 查询当前队列中是否有该 DownloadEntry
      *
-     * @return DownloadEntry == null
+     * @return
      */
     public DownloadEntry queryById(String id) {
         return mDataChanger.queryDownloadEntryForQueue(id);

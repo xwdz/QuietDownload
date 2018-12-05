@@ -16,8 +16,6 @@
 
 package com.xwdz.download.core;
 
-import com.xwdz.download.utils.Constants;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
@@ -75,8 +73,8 @@ public class DownloadThread implements Runnable {
             if (!isSingleDownload) {
                 connection.setRequestProperty("Range", "bytes=" + mStartPos + "-" + mEndPos);
             }
-            connection.setConnectTimeout(Constants.CONNECT_TIME);
-            connection.setReadTimeout(Constants.READ_TIME);
+            connection.setConnectTimeout(QuietDownloader.getImpl().getConnTimeMillis());
+            connection.setReadTimeout(QuietDownloader.getImpl().getReadTimeoutMillis());
             int responseCode = connection.getResponseCode();
             RandomAccessFile raf = null;
             FileOutputStream fos = null;

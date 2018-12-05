@@ -65,7 +65,7 @@ class DownloadDBManager {
             return (ArrayList<DownloadEntry>) dao.query(dao.queryBuilder().prepare());
         } catch (SQLException e) {
             LOG.e(TAG, e.getMessage());
-            return null;
+            return new ArrayList<>();
         }
     }
 
@@ -83,14 +83,14 @@ class DownloadDBManager {
         return mDBHelper.getDao(DownloadEntry.class);
     }
 
-    public void deleteById(String id) {
+    public synchronized int deleteById(String id) {
         Dao<DownloadEntry, String> dao;
         try {
             dao = mDBHelper.getDao(DownloadEntry.class);
-            dao.deleteById(id);
+            return dao.deleteById(id);
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
+        return -1;
     }
 }

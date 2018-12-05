@@ -62,26 +62,6 @@ public class QuietDownloader {
         context.getApplicationContext().startService(new Intent(context, DownloadService.class));
     }
 
-
-    private int mConnTimeMillis = 30 * 1000;
-    private int mReadTimeoutMillis = 30 * 1000;
-
-    public int getConnTimeMillis() {
-        return mConnTimeMillis;
-    }
-
-    public void setConnTimeMillis(int connTimeMillis) {
-        mConnTimeMillis = connTimeMillis;
-    }
-
-    public int getReadTimeoutMillis() {
-        return mReadTimeoutMillis;
-    }
-
-    public void setReadTimeoutMillis(int readTimeoutMillis) {
-        mReadTimeoutMillis = readTimeoutMillis;
-    }
-
     /**
      * @return 检查事件间隔时间
      */

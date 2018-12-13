@@ -203,14 +203,6 @@ public class DownloadService extends Service {
     }
 
     private void addDownload(DownloadEntry downloadEntry) {
-        final DownloadEntry memoryEntry = mDataChanger.queryDownloadEntryForQueue(downloadEntry.id);
-        if (memoryEntry != null) {
-            if (memoryEntry.status == DownloadEntry.DownloadStatus.DOWNLOADING) {
-                LOG.w(TAG, "entry:" + downloadEntry + " already downloading..");
-                return;
-            }
-        }
-
         if (mDownloadingTasks.size() >= QuietConfigs.getImpl().getMaxDownloadTasks()) {
             mWaitingQueue.offer(downloadEntry);
             downloadEntry.status = DownloadEntry.DownloadStatus.WAITING;
@@ -250,7 +242,7 @@ public class DownloadService extends Service {
         ArrayList<EventIntercept> eventIntercepts = QuietConfigs.getImpl().getEventIntercepts();
         if (!eventIntercepts.isEmpty()) {
             for (EventIntercept eventIntercept : eventIntercepts) {
-                boolean result = eventIntercept.onIntnercept(downloadEntry);
+                boolean result = eventIntercept.onIntercept(downloadEntry);
                 if (result) {
                     return;
                 }

@@ -18,6 +18,7 @@ package com.xwdz.download.core;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 
 import com.j256.ormlite.dao.Dao;
 import com.xwdz.download.QuietConfigs;
@@ -59,7 +60,12 @@ public class QuietDownloader {
         mContext = context;
         mDataChanger.initContext(context);
         DownloadDBManager.getImpl().initDBHelper(context);
-        context.getApplicationContext().startService(new Intent(context, DownloadService.class));
+        Intent intent = new Intent(context, DownloadService.class);
+        if (Build.VERSION.SDK_INT >= 26) {
+            context.getApplicationContext().startForegroundService(intent);
+        } else {
+            context.getApplicationContext().startService(intent);
+        }
     }
 
     /**

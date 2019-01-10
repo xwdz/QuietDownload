@@ -54,8 +54,8 @@ implementation 'com.xwdz:QuietDownloader:$lastVersion'
 #### 配置
 
     1. 在您的Application处调用初始化代码:
-       XDownloaderManager.getImpl().bindService(this);
-       
+       DownloaderManager.getImpl().bindService(this); 
+   
     2. 添加一些列配置
         QuietConfig.getImpl()
                         // 默认下载路径为[sdcard/Download/包名/xxx.apk]
@@ -82,7 +82,7 @@ implementation 'com.xwdz:QuietDownloader:$lastVersion'
                    * @return true:  消费该事件终止运行下载任务
                    *         false: 正常执行下载任务
                    */
-                  boolean onHandlerNetworkStatus();
+    	boolean onHandlerNetworkStatus();
     }
               
     QuietConfig.getImpl().setHandlerNetworkListener(new QuietDownloadConfig.HandlerNetwork() {

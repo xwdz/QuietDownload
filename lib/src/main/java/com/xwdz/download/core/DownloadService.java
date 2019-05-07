@@ -52,7 +52,6 @@ public class DownloadService extends Service {
 
     @SuppressLint("NewApi")
     private ArrayMap<String, DownloadTaskManager> mDownloadingTasks = new ArrayMap<>();
-    private ExecutorService mExecutors;
     private LinkedBlockingDeque<DownloadEntry> mWaitingQueue = new LinkedBlockingDeque<>();
     private DataChanger mDataChanger;
 
@@ -91,7 +90,6 @@ public class DownloadService extends Service {
     public void onCreate() {
         super.onCreate();
         LOG.d(TAG, "downloader service Create ");
-        mExecutors = Executors.newCachedThreadPool();
         mDataChanger = DataChanger.getImpl();
         mDataChanger.initContext(this);
         mDownloadDBManager = DownloadDBManager.getImpl();
@@ -248,7 +246,7 @@ public class DownloadService extends Service {
                 }
             }
         }
-        DownloadTaskManager task = new DownloadTaskManager(downloadEntry, mHandler, mExecutors);
+        DownloadTaskManager task = new DownloadTaskManager(downloadEntry, mHandler);
         task.start();
         mDownloadingTasks.put(downloadEntry.id, task);
     }

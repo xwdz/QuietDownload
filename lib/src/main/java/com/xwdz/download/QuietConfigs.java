@@ -17,7 +17,6 @@
 package com.xwdz.download;
 
 import android.content.Context;
-import android.os.Environment;
 
 import com.xwdz.download.core.EventIntercept;
 
@@ -54,21 +53,13 @@ public class QuietConfigs {
         return HolderClass.INSTANCE;
     }
 
-    public QuietConfigs initDownloadFile(Context context) {
-        mDownloadDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath()
-                + File.separator + context.getPackageName());
-        initDownloadFile(mDownloadDir);
+
+    public QuietConfigs with(Context context) {
+        mDownloadDir = new File(context.getCacheDir() + File.separator + "QuietDownloader");
+        checkDownloadFileExists(mDownloadDir);
         return this;
     }
 
-
-    public QuietConfigs initDownloadFile(File file) {
-        mDownloadDir = file;
-        if (!mDownloadDir.exists()) {
-            mDownloadDir.mkdir();
-        }
-        return this;
-    }
 
     public int getMaxDownloadTasks() {
         return mMaxDownloadTasks;
@@ -94,7 +85,15 @@ public class QuietConfigs {
 
     public QuietConfigs setDownloadDir(File downloadDir) {
         this.mDownloadDir = downloadDir;
+        checkDownloadFileExists(mDownloadDir);
         return this;
+    }
+
+    private void checkDownloadFileExists(File file) {
+        mDownloadDir = file;
+        if (!mDownloadDir.exists()) {
+            mDownloadDir.mkdir();
+        }
     }
 
     public QuietConfigs setDebug(boolean debug) {

@@ -21,12 +21,13 @@ import android.app.Application;
 import com.xwdz.download.QuietConfigs;
 import com.xwdz.download.core.QuietDownloader;
 
+import java.io.File;
+
 /**
  * @author 黄兴伟 (xwd9989@gamil.com)
  * @since 2018/9/3
  */
 public class App extends Application {
-
 
 
     @Override
@@ -35,15 +36,22 @@ public class App extends Application {
 
         QuietDownloader.getImpl().bindService(this);
 
+
+        File file = new File(getFilesDir().getAbsolutePath() + File.separator + "xwdz");
+        if (!file.exists()) {
+            file.mkdir();
+        }
+
         QuietConfigs.getImpl()
-                .initDownloadFile(this)
+                .with(this)
                 .setMaxDownloadTasks(5)
+                .setDownloadDir(file)
                 .setMaxRetryCount(3)
                 .setHandlerNetworkListener(new QuietConfigs.HandlerNetworkListener() {
-            @Override
-            public boolean onHandlerNetworkStatus() {
-                return false;
-            }
-        });
+                    @Override
+                    public boolean onHandlerNetworkStatus() {
+                        return false;
+                    }
+                });
     }
 }

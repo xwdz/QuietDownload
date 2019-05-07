@@ -32,12 +32,10 @@ import java.util.concurrent.ExecutorService;
  */
 public class DownloadTaskManager implements ConnectThread.ConnectListener, DownloadThread.DownloadListener {
 
-
     private static final String TAG = DownloadTaskManager.class.getSimpleName();
 
     private final DownloadEntry mDownloadEntry;
     private final Handler mHandler;
-    private final ExecutorService mExecutor;
     private volatile boolean isPaused;
     private volatile boolean isCancelled;
     private ConnectThread mConnectThread;
@@ -46,10 +44,9 @@ public class DownloadTaskManager implements ConnectThread.ConnectListener, Downl
     private File mDestFile;
 
 
-    DownloadTaskManager(DownloadEntry downloadEntry, Handler handler, ExecutorService mExecutor) {
+    DownloadTaskManager(DownloadEntry downloadEntry, Handler handler) {
         this.mDownloadEntry = downloadEntry;
         this.mHandler = handler;
-        this.mExecutor = mExecutor;
         this.mDestFile = QuietConfigs.getImpl().getDownloadFile(downloadEntry.name);
         LOG.d(TAG, "dest path:" + mDestFile.getAbsolutePath());
     }
@@ -89,13 +86,14 @@ public class DownloadTaskManager implements ConnectThread.ConnectListener, Downl
         } else {
             mDownloadEntry.status = (DownloadEntry.DownloadStatus.CONNECTING);
             notifyUpdate(mDownloadEntry, DownloadService.NOTIFY_CONNECTING);
+
             mConnectThread = new ConnectThread(mDownloadEntry.url, this);
-            mExecutor.execute(mConnectThread);
+            QuietExecutors.execute(mConnectThread);
         }
     }
 
     private void startDownload() {
-        LOG.e(TAG, "download: isSupportRange-" + mDownloadEntry.isSupportRange);
+        LOG.w(TAG, "download: isSupportRange-" + mDownloadEntry.isSupportRange);
         if (mDownloadEntry.isSupportRange) {
             startMultiDownload();
         } else {
@@ -104,7 +102,7 @@ public class DownloadTaskManager implements ConnectThread.ConnectListener, Downl
     }
 
     private void startMultiDownload() {
-        LOG.e(TAG, "startMultiDownload");
+        LOG.w(TAG, "startMultiDownload");
         mDownloadEntry.status = (DownloadEntry.DownloadStatus.DOWNLOADING);
         notifyUpdate(mDownloadEntry, DownloadService.NOTIFY_DOWNLOADING);
         int block = mDownloadEntry.totalLength / QuietConfigs.getImpl().getMaxDownloadThreads();
@@ -129,7 +127,7 @@ public class DownloadTaskManager implements ConnectThread.ConnectListener, Downl
             if (startPos < endPos) {
                 mDownloadThreads[i] = new DownloadThread(mDownloadEntry.url, mDestFile, i, startPos, endPos, this);
                 mDownloadStatus[i] = DownloadEntry.DownloadStatus.DOWNLOADING;
-                mExecutor.execute(mDownloadThreads[i]);
+                QuietExecutors.execute(mDownloadThreads[i]);
             } else {
                 mDownloadStatus[i] = DownloadEntry.DownloadStatus.COMPLETED;
             }
@@ -137,18 +135,18 @@ public class DownloadTaskManager implements ConnectThread.ConnectListener, Downl
     }
 
     private void startSingleDownload() {
-        LOG.e(TAG, "startSingleDownload");
+        LOG.w(TAG, "startSingleDownload");
         mDownloadEntry.status = DownloadEntry.DownloadStatus.DOWNLOADING;
         notifyUpdate(mDownloadEntry, DownloadService.NOTIFY_DOWNLOADING);
         mDownloadStatus = new DownloadEntry.DownloadStatus[1];
         mDownloadStatus[0] = mDownloadEntry.status;
         mDownloadThreads = new DownloadThread[1];
         mDownloadThreads[0] = new DownloadThread(mDownloadEntry.url, mDestFile, 0, 0, 0, this);
-        mExecutor.execute(mDownloadThreads[0]);
+        QuietExecutors.execute(mDownloadThreads[0]);
     }
 
     private void notifyUpdate(DownloadEntry downloadEntry, int what) {
-        LOG.e(TAG, "notifyUpdate:" + what + ":" + downloadEntry.currentLength);
+        LOG.w(TAG, "notifyUpdate:" + what + ":" + downloadEntry.currentLength);
         if (mHandler.hasMessages(what)) {
             mHandler.removeMessages(what);
         }

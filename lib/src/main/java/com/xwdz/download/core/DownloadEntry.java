@@ -19,18 +19,16 @@ package com.xwdz.download.core;
 import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
-import com.xwdz.download.QuietConfigs;
 
 import java.io.File;
 import java.io.Serializable;
 import java.util.HashMap;
 
 /**
- * @author huangxingwei(xwdz9989@gmall.com)
+ * @author huangxingwei(xwdz9989 @ gmall.com)
  */
 @DatabaseTable(tableName = "downloadentry")
 public class DownloadEntry implements Serializable, Cloneable {
-
 
     @DatabaseField(id = true)
     public String id;
@@ -48,34 +46,29 @@ public class DownloadEntry implements Serializable, Cloneable {
     public boolean isSupportRange = false;
     @DatabaseField(dataType = DataType.SERIALIZABLE)
     public HashMap<Integer, Integer> ranges;
+    @DatabaseField
+    public String local;
+
 
     public DownloadEntry() {
 
     }
 
-
-    public DownloadEntry(String url) {
-        this.url = url;
-        this.id = url;
-        this.name = url.substring(url.lastIndexOf("/") + 1);
-    }
-
+    /**
+     * @param url  下载地址
+     * @param name 文件名称（带后缀）
+     */
     public DownloadEntry(String url, String name) {
         this.url = url;
         this.id = url;
         this.name = name;
-    }
-
-    public DownloadEntry(String url, String id, String name) {
-        this.url = url;
-        this.id = id;
-        this.name = name;
+        this.local = QuietDownloader.getImpl().getConfigs().getDownloadFile(name).getAbsolutePath();
     }
 
     public void reset() {
         currentLength = 0;
         ranges = null;
-        File file = QuietConfigs.getImpl().getDownloadFile(url);
+        File file = QuietDownloader.getImpl().getConfigs().getDownloadFile(url);
         if (file.exists()) {
             file.delete();
         }
@@ -83,7 +76,7 @@ public class DownloadEntry implements Serializable, Cloneable {
 
 
     public DownloadEntry newEntry(DownloadEntry entry) {
-        DownloadEntry downloadEntry = new DownloadEntry(entry.url);
+        DownloadEntry downloadEntry = new DownloadEntry(entry.url, entry.name);
         downloadEntry.status = entry.status;
         downloadEntry.currentLength = entry.currentLength;
         downloadEntry.totalLength = entry.totalLength;
@@ -116,7 +109,16 @@ public class DownloadEntry implements Serializable, Cloneable {
 
     @Override
     public String toString() {
-        return name + " is " + status.name() + " with " + currentLength + "/" + totalLength;
+        return "DownloadEntry{" +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
+                ", url='" + url + '\'' +
+                ", currentLength=" + currentLength +
+                ", totalLength=" + totalLength +
+                ", status=" + status +
+                ", isSupportRange=" + isSupportRange +
+                ", local='" + local + '\'' +
+                '}';
     }
 
     @Override

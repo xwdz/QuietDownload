@@ -15,8 +15,6 @@
         android:supportsRtl="true"
         android:name=".App"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity">
-        </activity>
 
         <service android:name="com.xwdz.download.core.DownloadService"/>
         <activity android:name=".ListActivity" >

@@ -17,21 +17,21 @@
 package com.xwdz.download.core;
 
 import android.annotation.SuppressLint;
+import android.app.Notification;
 import android.app.Service;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.util.ArrayMap;
 
-import com.xwdz.download.QuietConfigs;
+import com.xwdz.download.DownloadConfig;
 import com.xwdz.download.utils.Constants;
 import com.xwdz.download.utils.LOG;
 
 import java.util.ArrayList;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingDeque;
 
 /**
@@ -54,6 +54,7 @@ public class DownloadService extends Service {
     private ArrayMap<String, DownloadTaskManager> mDownloadingTasks = new ArrayMap<>();
     private LinkedBlockingDeque<DownloadEntry> mWaitingQueue = new LinkedBlockingDeque<>();
     private DataChanger mDataChanger;
+    private DownloadConfig mDownloadConfig;
 
     private Handler mHandler = new Handler(new Handler.Callback() {
         @Override
@@ -90,9 +91,15 @@ public class DownloadService extends Service {
     public void onCreate() {
         super.onCreate();
         LOG.d(TAG, "downloader service Create ");
+        if (Build.VERSION.SDK_INT >= 26) {
+            startForeground(1, new Notification());
+        }
+
         mDataChanger = DataChanger.getImpl();
         mDataChanger.initContext(this);
+        mDownloadConfig = QuietDownloader.getImpl().getConfigs();
         mDownloadDBManager = DownloadDBManager.getImpl();
+
         initDownload();
     }
 
@@ -109,7 +116,7 @@ public class DownloadService extends Service {
 
                 if (downloadEntry.status == DownloadEntry.DownloadStatus.DOWNLOADING
                         || downloadEntry.status == DownloadEntry.DownloadStatus.WAITING) {
-                    if (QuietConfigs.getImpl().isRecoverDownloadWhenStart()) {
+                    if (mDownloadConfig.isRecoverDownloadWhenStart()) {
                         if (downloadEntry.isSupportRange) {
                             downloadEntry.status = DownloadEntry.DownloadStatus.PAUSED;
                         } else {
@@ -201,7 +208,7 @@ public class DownloadService extends Service {
     }
 
     private void addDownload(DownloadEntry downloadEntry) {
-        if (mDownloadingTasks.size() >= QuietConfigs.getImpl().getMaxDownloadTasks()) {
+        if (mDownloadingTasks.size() >= mDownloadConfig.getMaxDownloadTasks()) {
             mWaitingQueue.offer(downloadEntry);
             downloadEntry.status = DownloadEntry.DownloadStatus.WAITING;
             mDataChanger.postNotifyStatus(downloadEntry);
@@ -237,15 +244,6 @@ public class DownloadService extends Service {
     }
 
     private void startDownload(DownloadEntry downloadEntry) {
-        ArrayList<EventIntercept> eventIntercepts = QuietConfigs.getImpl().getEventIntercepts();
-        if (!eventIntercepts.isEmpty()) {
-            for (EventIntercept eventIntercept : eventIntercepts) {
-                boolean result = eventIntercept.onIntercept(downloadEntry);
-                if (result) {
-                    return;
-                }
-            }
-        }
         DownloadTaskManager task = new DownloadTaskManager(downloadEntry, mHandler);
         task.start();
         mDownloadingTasks.put(downloadEntry.id, task);

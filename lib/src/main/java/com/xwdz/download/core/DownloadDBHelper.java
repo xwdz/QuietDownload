@@ -18,7 +18,6 @@ package com.xwdz.download.core;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteDatabase.CursorFactory;
 
 import com.j256.ormlite.android.apptools.OrmLiteSqliteOpenHelper;
 import com.j256.ormlite.support.ConnectionSource;
@@ -28,12 +27,9 @@ import java.sql.SQLException;
 
 class DownloadDBHelper extends OrmLiteSqliteOpenHelper {
 
-    public static final String DB_NAME = "xwdz_downloader";
-    public static final int DB_VERSION = 2;
+    private static final String DB_NAME = "xwdz_downloader";
+    private static final int DB_VERSION = 3;
 
-    public DownloadDBHelper(Context context, String databaseName, CursorFactory factory, int databaseVersion) {
-        super(context, DB_NAME, factory, DB_VERSION);
-    }
 
     public DownloadDBHelper(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
@@ -49,7 +45,15 @@ class DownloadDBHelper extends OrmLiteSqliteOpenHelper {
     }
 
     @Override
-    public void onUpgrade(SQLiteDatabase database, ConnectionSource connectionSource, int arg2, int arg3) {
+    public void onUpgrade(SQLiteDatabase database, ConnectionSource connectionSource, int oldVersion, int newVersion) {
+        if (newVersion > oldVersion) {
+            try {
+                TableUtils.dropTable(connectionSource, DownloadEntry.class, true);
+                onCreate(database, connectionSource);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
 }

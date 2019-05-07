@@ -21,7 +21,7 @@ import android.content.Intent;
 import android.os.Build;
 
 import com.j256.ormlite.dao.Dao;
-import com.xwdz.download.QuietConfigs;
+import com.xwdz.download.DownloadConfig;
 import com.xwdz.download.notify.DataUpdatedWatcher;
 import com.xwdz.download.utils.Constants;
 import com.xwdz.download.utils.LOG;
@@ -35,6 +35,7 @@ import java.util.ArrayList;
  */
 public class QuietDownloader {
 
+    private static final String TAG = QuietDownloader.class.getSimpleName();
 
     private static class Holder {
         private static final QuietDownloader INSTANCE = new QuietDownloader();
@@ -44,27 +45,38 @@ public class QuietDownloader {
         return Holder.INSTANCE;
     }
 
-    private static final String TAG = QuietDownloader.class.getSimpleName();
+    private QuietDownloader() {
+        mDataChanger = DataChanger.getImpl();
+    }
+
+
     private static boolean mInit;
 
     private Context mContext;
     private long mLastOperatedTime = 0;
     private DataChanger mDataChanger;
+    private DownloadConfig mDownloadConfig;
 
-    private QuietDownloader() {
-        mDataChanger = DataChanger.getImpl();
+
+    public void setDownloadConfig(DownloadConfig downloadConfig) {
+        this.mDownloadConfig = downloadConfig;
     }
 
-    public void bindService(Context context) {
+    public void bindContext(Context context) {
+        this.mContext = context.getApplicationContext();
+        this.mDownloadConfig = new DownloadConfig(mContext);
+        this.mDataChanger.initContext(mContext);
+        DownloadDBManager.getImpl().initDBHelper(mContext);
+    }
+
+
+    public void bindService() {
         mInit = true;
-        mContext = context;
-        mDataChanger.initContext(context);
-        DownloadDBManager.getImpl().initDBHelper(context);
-        Intent intent = new Intent(context, DownloadService.class);
+        Intent intent = new Intent(mContext, DownloadService.class);
         if (Build.VERSION.SDK_INT >= 26) {
-            context.getApplicationContext().startForegroundService(intent);
+            mContext.startForegroundService(intent);
         } else {
-            context.getApplicationContext().startService(intent);
+            mContext.startService(intent);
         }
     }
 
@@ -73,7 +85,7 @@ public class QuietDownloader {
      */
     private boolean checkIfExecutable() {
         long tmp = System.currentTimeMillis();
-        boolean isMinTimeInterval = tmp - mLastOperatedTime > QuietConfigs.getImpl().getMinOperateInterval();
+        boolean isMinTimeInterval = tmp - mLastOperatedTime > mDownloadConfig.getMinOperateInterval();
         if (isMinTimeInterval && mInit) {
             mLastOperatedTime = tmp;
             return true;
@@ -86,7 +98,7 @@ public class QuietDownloader {
     /**
      * 开始下载一个任务
      */
-    public void download(DownloadEntry downloadEntry) {
+    public void addDownload(DownloadEntry downloadEntry) {
         if (!checkIfExecutable()) {
             return;
         }
@@ -196,26 +208,31 @@ public class QuietDownloader {
 
     /**
      * 删除一个任务从数据库中
-     *
-     * @param forceDelete
-     * @param id
      */
-    public void deleteById(boolean forceDelete, String id) {
+    public void deleteById(String id) {
         mDataChanger.deleteDownloadEntry(id);
-        if (forceDelete) {
-            File file = QuietConfigs.getImpl().getDownloadFile(id);
-            if (file.exists())
-                file.delete();
-        }
+    }
+
+    /**
+     * 待删除的文件名称,从下载文件夹中
+     *
+     * @param name 文件名
+     */
+    public void deleteFileByName(String name) {
+        File file = mDownloadConfig.getDownloadFile(name);
+        if (file.exists())
+            file.delete();
     }
 
 
     /**
      * 查询当前队列中是否有该 DownloadEntry
-     *
-     * @return
      */
     public DownloadEntry queryById(String id) {
         return mDataChanger.queryDownloadEntryForQueue(id);
+    }
+
+    public DownloadConfig getConfigs() {
+        return mDownloadConfig;
     }
 }

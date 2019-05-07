@@ -27,6 +27,7 @@ import android.widget.TextView;
 import com.xwdz.download.core.QuietDownloader;
 import com.xwdz.download.core.DownloadEntry;
 import com.xwdz.download.notify.DataUpdatedWatcher;
+import com.xwdz.download.utils.LOG;
 
 public class AppDetailActivity extends AppCompatActivity {
 
@@ -39,6 +40,7 @@ public class AppDetailActivity extends AppCompatActivity {
 
         @Override
         public void notifyUpdate(DownloadEntry data) {
+            LOG.w(LOG.TAG, "watcher:" + data.toString());
             if (data.id.equals(entry.id)) {
                 entry = data;
                 initializeData();
@@ -57,6 +59,11 @@ public class AppDetailActivity extends AppCompatActivity {
         mAppEntry = (AppEntry) getIntent().getSerializableExtra("url");
         mDownloadManager = QuietDownloader.getImpl();
         entry = mDownloadManager.queryById(mAppEntry.url) == null ? mDownloadManager.queryById(mAppEntry.url) : mAppEntry.generateDownloadEntry();
+
+
+        if (entry.status != DownloadEntry.DownloadStatus.COMPLETED) {
+            mDownloadManager.addDownload(entry);
+        }
 
         initializeData();
     }

@@ -16,7 +16,7 @@
 
 package com.xwdz.download.core;
 
-import com.xwdz.download.QuietConfigs;
+import com.xwdz.download.DownloadConfig;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -28,11 +28,11 @@ import java.net.URL;
 /**
  * @author 黄兴伟 (xwdz9989@gamil.com)
  */
-public class DownloadThread implements Runnable {
+class DownloadThread implements Runnable {
 
     private static final String TAG = DownloadThread.class.getSimpleName();
 
-    private static final int BUFF_SIZE = 4096;
+    private static final int BUFF_SIZE = 1024 * 8;
 
     private final String mUrl;
     private final int mStartPos;
@@ -41,15 +41,17 @@ public class DownloadThread implements Runnable {
     private final DownloadListener mListener;
     private final int mThreadIndex;
     private final boolean isSingleDownload;
-    private volatile boolean isPaused;
-
     private DownloadEntry.DownloadStatus mStatus;
+
+    private volatile boolean isPaused;
     private volatile boolean isCancelled;
     private volatile boolean isError;
     private volatile boolean isCompleted;
 
+    private DownloadConfig mDownloadConfig;
 
-    public DownloadThread(String url, File destFile, int threadIndex, int startPos, int endPos, DownloadListener listener) {
+
+    DownloadThread(String url, File destFile, int threadIndex, int startPos, int endPos, DownloadListener listener) {
         this.mUrl = url;
         this.mThreadIndex = threadIndex;
         this.mStartPos = startPos;
@@ -57,6 +59,7 @@ public class DownloadThread implements Runnable {
         this.mDestFile = destFile;
         this.mListener = listener;
         isSingleDownload = startPos == 0 && endPos == 0;
+        mDownloadConfig = QuietDownloader.getImpl().getConfigs();
     }
 
     @Override
@@ -75,8 +78,11 @@ public class DownloadThread implements Runnable {
             if (!isSingleDownload) {
                 connection.setRequestProperty("Range", "bytes=" + mStartPos + "-" + mEndPos);
             }
-            connection.setConnectTimeout(QuietConfigs.getImpl().getConnTimeMillis());
-            connection.setReadTimeout(QuietConfigs.getImpl().getReadTimeoutMillis());
+            connection.setConnectTimeout(mDownloadConfig.getConnTimeMillis());
+            connection.setReadTimeout(mDownloadConfig.getReadTimeoutMillis());
+            connection.setRequestProperty("Connection", "close");
+
+
             int responseCode = connection.getResponseCode();
             RandomAccessFile raf = null;
             FileOutputStream fos = null;
@@ -120,6 +126,7 @@ public class DownloadThread implements Runnable {
                         }
 
                     }
+                    fos.flush();
 
                 } finally {
                     if (fos != null) {
@@ -173,19 +180,19 @@ public class DownloadThread implements Runnable {
         return mStatus == DownloadEntry.DownloadStatus.DOWNLOADING;
     }
 
-    public void pause() {
+    public void callPause() {
         isPaused = true;
     }
 
-    public void cancel() {
+    public void callCancel() {
         isCancelled = true;
     }
 
-    public void cancelByError() {
+    public void callCancelByError() {
         isError = true;
     }
 
-    public void completed() {
+    public void callCompleted() {
         isCompleted = true;
     }
 

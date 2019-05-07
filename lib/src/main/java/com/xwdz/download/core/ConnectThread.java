@@ -17,8 +17,6 @@
 package com.xwdz.download.core;
 
 
-import com.xwdz.download.QuietConfigs;
-
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -44,8 +42,8 @@ public class ConnectThread implements Runnable {
         try {
             connection = (HttpURLConnection) new URL(mUrl).openConnection();
             connection.setRequestMethod("GET");
-            connection.setConnectTimeout(QuietConfigs.getImpl().getConnTimeMillis());
-            connection.setReadTimeout(QuietConfigs.getImpl().getReadTimeoutMillis());
+            connection.setConnectTimeout(QuietDownloader.getImpl().getConfigs().getConnTimeMillis());
+            connection.setReadTimeout(QuietDownloader.getImpl().getConfigs().getReadTimeoutMillis());
             int responseCode = connection.getResponseCode();
             int contentLength = connection.getContentLength();
             boolean isSupportRange = false;

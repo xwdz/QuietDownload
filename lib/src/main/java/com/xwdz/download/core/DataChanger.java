@@ -55,7 +55,9 @@ class DataChanger extends Observable {
         checkContext(mContext);
 
         mOperatedEntries.put(downloadEntry.id, downloadEntry);
+
         DownloadDBManager.getImpl().newOrUpdate(downloadEntry);
+
         setChanged();
         notifyObservers(downloadEntry);
     }

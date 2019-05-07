@@ -62,8 +62,8 @@ public class ListActivity extends AppCompatActivity {
         mQuietDownloader = QuietDownloader.getImpl();
         setContentView(R.layout.activity_list);
 
-        mDownloadEntries.add(new DownloadEntry("https://dldir1.qq.com/weixin/android/weixin673android1360.apk"));
-//        mDownloadEntries.add(new DownloadEntry("http://shouji.360tpcdn.com/150706/f67f98084d6c788a0f4593f588ea9dfc/com.taobao.taobao_121.apk"));
+        mDownloadEntries.add(new DownloadEntry("https://dldir1.qq.com/weixin/android/weixin673android1360.apk", "微信Apk.apk"));
+        mDownloadEntries.add(new DownloadEntry("http://seopic.699pic.com/photo/50035/0520.jpg_wh1200.jpg", "这是一张图片.jpg"));
 //        mDownloadEntries.add(new DownloadEntry("http://shouji.360tpcdn.com/150720/789cd3f2facef6b27004d9f813599463/com.mfw.roadbook_147.apk"));
 //        mDownloadEntries.add(new DownloadEntry("http://shouji.360tpcdn.com/150810/10805820b9fbe1eeda52be289c682651/com.qihoo.vpnmaster_3019020.apk"));
 //        mDownloadEntries.add(new DownloadEntry("http://shouji.360tpcdn.com/150730/580642ffcae5fe8ca311c53bad35bcf2/com.taobao.trip_3001032.apk"));
@@ -122,7 +122,7 @@ public class ListActivity extends AppCompatActivity {
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             if (convertView == null || convertView.getTag() == null) {
-                convertView = LayoutInflater.from(ListActivity.this).inflate(R.layout.activity_list_item, parent,false);
+                convertView = LayoutInflater.from(ListActivity.this).inflate(R.layout.activity_list_item, parent, false);
                 holder = new ViewHolder();
                 holder.mDownloadBtn = (Button) convertView.findViewById(R.id.downloadBtn);
                 holder.mDownloadLabel = (TextView) convertView.findViewById(R.id.downloadLabel);
@@ -146,7 +146,7 @@ public class ListActivity extends AppCompatActivity {
                     if (entry.status == DownloadEntry.DownloadStatus.IDLE
                             || entry.status == DownloadEntry.DownloadStatus.CANCELLED
                             || entry.status == DownloadEntry.DownloadStatus.PAUSED) {
-                        mQuietDownloader.download(entry);
+                        mQuietDownloader.addDownload(entry);
                     }
                 }
             });

@@ -18,10 +18,8 @@ package com.example.quinn.downloadertest;
 
 import android.app.Application;
 
-import com.xwdz.download.QuietConfigs;
+import com.xwdz.download.DownloadConfig;
 import com.xwdz.download.core.QuietDownloader;
-
-import java.io.File;
 
 /**
  * @author 黄兴伟 (xwd9989@gamil.com)
@@ -34,24 +32,8 @@ public class App extends Application {
     public void onCreate() {
         super.onCreate();
 
-        QuietDownloader.getImpl().bindService(this);
-
-
-        File file = new File(getFilesDir().getAbsolutePath() + File.separator + "xwdz");
-        if (!file.exists()) {
-            file.mkdir();
-        }
-
-        QuietConfigs.getImpl()
-                .with(this)
-                .setMaxDownloadTasks(5)
-                .setDownloadDir(file)
-                .setMaxRetryCount(3)
-                .setHandlerNetworkListener(new QuietConfigs.HandlerNetworkListener() {
-                    @Override
-                    public boolean onHandlerNetworkStatus() {
-                        return false;
-                    }
-                });
+        QuietDownloader.getImpl().bindContext(this);
+        QuietDownloader.getImpl().bindService();
     }
+
 }

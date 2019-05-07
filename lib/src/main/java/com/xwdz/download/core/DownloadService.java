@@ -141,7 +141,7 @@ public class DownloadService extends Service {
             LOG.d(TAG, "onStartCommand receiver intent:" + intent);
             DownloadEntry downloadEntry = (DownloadEntry) intent.getSerializableExtra(Constants.KEY_DOWNLOAD_ENTRY);
             if (downloadEntry == null) {
-                LOG.e(TAG, "onStartCommand receiver downloadEntry is null");
+                LOG.w(TAG, "onStartCommand receiver downloadEntry is null");
                 return START_STICKY;
             }
 
@@ -203,14 +203,6 @@ public class DownloadService extends Service {
     }
 
     private void addDownload(DownloadEntry downloadEntry) {
-        final DownloadEntry memoryEntry = mDataChanger.queryDownloadEntryForQueue(downloadEntry.id);
-        if (memoryEntry != null) {
-            if (memoryEntry.status == DownloadEntry.DownloadStatus.DOWNLOADING) {
-                LOG.w(TAG, "entry:" + downloadEntry + " already downloading..");
-                return;
-            }
-        }
-
         if (mDownloadingTasks.size() >= QuietConfigs.getImpl().getMaxDownloadTasks()) {
             mWaitingQueue.offer(downloadEntry);
             downloadEntry.status = DownloadEntry.DownloadStatus.WAITING;
@@ -250,7 +242,7 @@ public class DownloadService extends Service {
         ArrayList<EventIntercept> eventIntercepts = QuietConfigs.getImpl().getEventIntercepts();
         if (!eventIntercepts.isEmpty()) {
             for (EventIntercept eventIntercept : eventIntercepts) {
-                boolean result = eventIntercept.onIntnercept(downloadEntry);
+                boolean result = eventIntercept.onIntercept(downloadEntry);
                 if (result) {
                     return;
                 }

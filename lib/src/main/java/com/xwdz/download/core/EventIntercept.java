@@ -17,13 +17,13 @@
 package com.xwdz.download.core;
 
 /**
- * 拦截器会在如下流程中执行 onIntnercept 方法
+ * 拦截器会在如下流程中执行 onIntercept 方法
  *
  * @author 黄兴伟 (xwdz9989@gamil.com)
  * @since 2018/9/13
  */
 public interface EventIntercept {
 
-    boolean onIntnercept(DownloadEntry downloadEntry);
+    boolean onIntercept(DownloadEntry downloadEntry);
 
 }

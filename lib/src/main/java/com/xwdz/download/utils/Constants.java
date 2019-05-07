@@ -32,6 +32,4 @@ public class Constants {
     public static final int KEY_DOWNLOAD_ACTION_PAUSE_ALL = 5;
 
     public static final int KEY_DOWNLOAD_ACTION_RECOVER_ALL = 6;
-    public static final int CONNECT_TIME = 10 * 1000;
-    public static final int READ_TIME = 10 * 1000;
 }

@@ -54,8 +54,8 @@ implementation 'com.xwdz:QuietDownloader:$lastVersion'
 #### 配置
 
     1. 在您的Application处调用初始化代码:
-       XDownloaderManager.getImpl().bindService(this);
-       
+       DownloaderManager.getImpl().bindService(this); 
+   
     2. 添加一些列配置
         QuietConfig.getImpl()
                         // 默认下载路径为[sdcard/Download/包名/xxx.apk]
@@ -82,7 +82,7 @@ implementation 'com.xwdz:QuietDownloader:$lastVersion'
                    * @return true:  消费该事件终止运行下载任务
                    *         false: 正常执行下载任务
                    */
-                  boolean onHandlerNetworkStatus();
+    	boolean onHandlerNetworkStatus();
     }
               
     QuietConfig.getImpl().setHandlerNetworkListener(new QuietDownloadConfig.HandlerNetwork() {
@@ -229,9 +229,15 @@ public class DownloadEntry implements Serializable {
 
 ## 版本历史
 
-### v1.0.0
+### v1.0.3
+  - 新增配置`QuietDownloader.setReadTimeoutMillis()`,`QuietDownloader.setConnTimeMillis`
+
+### v1.0.2
+  - [fix Issues5](https://github.com/xwdz/QuietDownload/issues/5)
+
+### v1.0.1
   - `QuietConigs`提供自定义下载目录
-  - `QuietDownloader` 新增`queryEntryForQueue()`Api
+  - `QuietDownloader` 新增`queryEntryByIdForQueue()`Api
   - [Fix Issues3](https://github.com/xwdz/QuietDownload/issues/3)
 
 ### v0.0.6

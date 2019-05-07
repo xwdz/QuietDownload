@@ -160,6 +160,27 @@ public class QuietConfigs {
         return this;
     }
 
+    private int mConnTimeMillis = 30 * 1000;
+    private int mReadTimeoutMillis = 30 * 1000;
+
+    public int getConnTimeMillis() {
+        return mConnTimeMillis;
+    }
+
+    public QuietConfigs setConnTimeMillis(int connTimeMillis) {
+        mConnTimeMillis = connTimeMillis;
+        return this;
+    }
+
+    public int getReadTimeoutMillis() {
+        return mReadTimeoutMillis;
+    }
+
+    public QuietConfigs setReadTimeoutMillis(int readTimeoutMillis) {
+        mReadTimeoutMillis = readTimeoutMillis;
+        return this;
+    }
+
 
     public interface HandlerNetworkListener {
         /**

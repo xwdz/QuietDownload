@@ -18,6 +18,7 @@ package com.xwdz.download.core;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 
 import com.j256.ormlite.dao.Dao;
 import com.xwdz.download.QuietConfigs;
@@ -59,7 +60,12 @@ public class QuietDownloader {
         mContext = context;
         mDataChanger.initContext(context);
         DownloadDBManager.getImpl().initDBHelper(context);
-        context.getApplicationContext().startService(new Intent(context, DownloadService.class));
+        Intent intent = new Intent(context, DownloadService.class);
+        if (Build.VERSION.SDK_INT >= 26) {
+            context.getApplicationContext().startForegroundService(intent);
+        } else {
+            context.getApplicationContext().startService(intent);
+        }
     }
 
     /**
@@ -175,13 +181,6 @@ public class QuietDownloader {
     }
 
     /**
-     * 查询一个任务从数据库中
-     */
-    public DownloadEntry queryById(String id) {
-        return mDataChanger.queryDownloadEntryById(id);
-    }
-
-    /**
      * @return 获取操作数据库Dao对象
      */
     public Dao<DownloadEntry, String> getDBDao() throws SQLException {
@@ -191,7 +190,7 @@ public class QuietDownloader {
     /**
      * 从数据库中查询所有下载任务
      */
-    public ArrayList<DownloadEntry> queryAllForDB() {
+    public ArrayList<DownloadEntry> queryAll() {
         return DownloadDBManager.getImpl().queryAll();
     }
 
@@ -201,7 +200,7 @@ public class QuietDownloader {
      * @param forceDelete
      * @param id
      */
-    public void deleteDownloadEntry(boolean forceDelete, String id) {
+    public void deleteById(boolean forceDelete, String id) {
         mDataChanger.deleteDownloadEntry(id);
         if (forceDelete) {
             File file = QuietConfigs.getImpl().getDownloadFile(id);
@@ -214,9 +213,9 @@ public class QuietDownloader {
     /**
      * 查询当前队列中是否有该 DownloadEntry
      *
-     * @return DownloadEntry == null
+     * @return
      */
-    public DownloadEntry queryDownloadEntryForQueue(String id) {
+    public DownloadEntry queryById(String id) {
         return mDataChanger.queryDownloadEntryForQueue(id);
     }
 }

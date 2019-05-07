@@ -63,7 +63,7 @@ public class DownloadTaskManager implements ConnectThread.ConnectListener, Downl
                     if (mDownloadEntry.isSupportRange) {
                         mDownloadThreads[i].pause();
                     } else {
-                        mDownloadThreads[i].cancel();
+                        mDownloadThreads[i].pause();
                     }
                 }
             }

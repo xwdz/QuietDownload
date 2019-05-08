@@ -42,6 +42,7 @@ allprojects {
 $lastVersion = [![](https://jitpack.io/v/xwdz/QuietDownload.svg)](https://jitpack.io/#xwdz/QuietDownload)
 
 ```
+implementation 'com.j256.ormlite:ormlite-android:4.48'
 implementation 'com.xwdz:QuietDownloader:$lastVersion'
 ```
 
@@ -206,6 +207,10 @@ public class DownloadEntry implements Serializable {
 ---
 
 ## 版本历史
+
+### v1.0.6beta
+  - 内部增加检查当前`DownloadEntry.status`机制，如果正在下载则忽略事件
+  - HTTP增加`Connect Header`
 
 ### v1.0.3
   - 新增配置`QuietDownloader.setReadTimeoutMillis()`,`QuietDownloader.setConnTimeMillis`

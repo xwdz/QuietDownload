@@ -61,13 +61,13 @@ public class DownloadEntry implements Serializable, Cloneable {
         this.url = url;
         this.id = url;
         this.name = name;
-        this.filePath = QuietDownloader.get().getConfigs().getDownloadFile(name).getAbsolutePath();
+        this.filePath = QuietDownloader.getImpl().getConfigs().getDownloadFile(name).getAbsolutePath();
     }
 
     public void reset() {
         currentLength = 0;
         ranges = null;
-        File file = QuietDownloader.get().getConfigs().getDownloadFile(url);
+        File file = QuietDownloader.getImpl().getConfigs().getDownloadFile(url);
         if (file.exists()) {
             file.delete();
         }

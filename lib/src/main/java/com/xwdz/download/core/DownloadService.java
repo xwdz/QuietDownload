@@ -16,7 +16,6 @@
 
 package com.xwdz.download.core;
 
-import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.Service;
 import android.content.Intent;
@@ -24,7 +23,6 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
-import android.util.ArrayMap;
 
 import com.xwdz.download.DownloadConfig;
 import com.xwdz.download.utils.Constants;
@@ -96,7 +94,7 @@ public class DownloadService extends Service {
 
         mDataChanger = DataChanger.getImpl();
         mDataChanger.initContext(this);
-        mDownloadConfig = QuietDownloader.get().getConfigs();
+        mDownloadConfig = QuietDownloader.getImpl().getConfigs();
 
         initDownload();
     }

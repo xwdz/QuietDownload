@@ -41,7 +41,7 @@ public class QuietDownloader {
         private static final QuietDownloader INSTANCE = new QuietDownloader();
     }
 
-    public static QuietDownloader get() {
+    public static QuietDownloader getImpl() {
         return Holder.INSTANCE;
     }
 
@@ -62,7 +62,7 @@ public class QuietDownloader {
         this.mDownloadConfig = downloadConfig;
     }
 
-    public void bindContext(Context context) {
+    public void setContext(Context context) {
         this.mContext = context.getApplicationContext();
         this.mDownloadConfig = new DownloadConfig(mContext);
         this.mDataChanger.initContext(mContext);
@@ -204,7 +204,7 @@ public class QuietDownloader {
      * 删除一个任务从数据库中
      */
     public void deleteById(String id) {
-        mDataChanger.deleteDownloadEntry(id);
+        mDataChanger.deleteById(id);
     }
 
     /**

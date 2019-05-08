@@ -43,8 +43,8 @@ public class ConnectThread implements Runnable {
             connection = (HttpURLConnection) new URL(mUrl).openConnection();
             connection.setRequestMethod("GET");
             connection.setRequestProperty("Connection", "close");
-            connection.setConnectTimeout(QuietDownloader.get().getConfigs().getConnTimeMillis());
-            connection.setReadTimeout(QuietDownloader.get().getConfigs().getReadTimeoutMillis());
+            connection.setConnectTimeout(QuietDownloader.getImpl().getConfigs().getConnTimeMillis());
+            connection.setReadTimeout(QuietDownloader.getImpl().getConfigs().getReadTimeoutMillis());
             int responseCode = connection.getResponseCode();
             int contentLength = connection.getContentLength();
             boolean isSupportRange = false;

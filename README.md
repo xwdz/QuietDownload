@@ -12,6 +12,7 @@
   - 取消单个任务
   - 取消全部任务
   - 暂停所有任务
+  - 支持队列
   - 队列最大同时下载任务数,超过则进入等待队列
   - 自动恢复上一次下载任务
  
@@ -22,7 +23,6 @@
 
 ```
     <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 ```
 
 
@@ -54,44 +54,20 @@ implementation 'com.xwdz:QuietDownloader:$lastVersion'
 #### 配置
 
     1. 在您的Application处调用初始化代码:
-       DownloaderManager.getImpl().bindService(this); 
-   
-    2. 添加一些列配置
-        QuietConfig.getImpl()
-                        // 默认下载路径为[sdcard/Download/包名/xxx.apk]
-                        // 若没有自定义下载文件路径,则必须调用该init代码
-                        .initDownloadFile(context) || .initDownloadFile(file) 
-                        //debug模式
-                        .setDebug(boolean isDebug)
-                        //下载文件路径
-                        .setDownloadDir(File file)
-                        // 队列最大同时下载任务数,超过则进入等待队列 默认:3
-                        .setMaxDownloadTasks(int)
-                        // 最大线程下载数   默认:3
-                        .setMaxDownloadThreads(int)
-                        // 间隔毫秒
-                        .setMinOperateInterval(long)
-                        // 打开界面自动恢复下载
-                        .setRecoverDownloadWhenStart(false);
-                        
-    QuietDownloadConfig还提供了一处全局处理网络的接口:
     
-    public interface HandlerNetwork {
-                  /**
-                   * 处理网络状况接口
-                   * @return true:  消费该事件终止运行下载任务
-                   *         false: 正常执行下载任务
-                   */
-    	boolean onHandlerNetworkStatus();
-    }
-              
-    QuietConfig.getImpl().setHandlerNetworkListener(new QuietDownloadConfig.HandlerNetwork() {
-         @Override
-         public boolean onHandlerNetworkStatus() {
-             // 自己的逻辑判断，提示当前不在wifi情况dialog 等
-             return false;
-         }
-     });
+        DownloadConfig downloadConfig = new DownloadConfig(this);
+        
+        // 自定义配置 均有默认值
+        
+        // downloadConfig.setMaxDownloadTasks(); 队列最大同时下载任务数,超过则进入等待队列 默认:3
+        // downloadConfig.setMaxDownloadThreads() 最大线程下载数   默认:3
+        // downloadConfig.setDownloadDir() 下载文件路径
+            ...省略若干
+        
+        QuietDownloader.get().setDownloadConfig(downloadConfig);
+        QuietDownloader.get().setContext(this);
+        QuietDownloader.get().startService(); 
+   
      
 #### DownloadEntry的几种状态
 
@@ -113,23 +89,26 @@ implementation 'com.xwdz:QuietDownloader:$lastVersion'
 ```
 private QuietDownload mDownloader = QuietDownload.getImpl();
 
-private final DownloadEntry downloadEntry = new DownloadEntry("url");
+private final DownloadEntry downloadEntry = new DownloadEntry("url","name");
 
   ... 省略代码
   
 ```
 
 
-|常用Api|参数|说明|
+|`mDownloader` 常用Api|参数|说明|
 |:---|:---|:---|
-|`download`|downloadEntry|下载一个任务|
+|`startDownload`|downloadEntry|下载一个任务|
 |`pause`|downloadEntry|在听一个任务|
 |`cancel`|downloadEntry|取消一个任务|
 |`resume`|downloadEntry|恢复一个下载任务|
 |`recoverAll`|无|恢复所有下载任务|
 |`pauseAll`|无|暂停所有任务|
 |`queryAll`|无|查询所有下载任务返回一个list|
+|`queryById`|id|查询一个`downloadEntry`从数据库中
+|`deleteById`|id|从数据库中删除一个downloadEntry|
 |`getDBDao`|无|返回`Dao<DownloadEntry, String>`自定义进行数据查询|
+
 
 ......
   
@@ -152,6 +131,7 @@ private final DownloadEntry downloadEntry = new DownloadEntry("url");
     
     // 省略若干代码
     
+    //监听下载状态
     @Override
     protected void onResume() {
         super.onResume();
@@ -180,23 +160,16 @@ public class DownloadEntry implements Serializable {
     public int totalLength;
         // ... 省略代码
 
-    public DownloadEntry(String url) {
-           this.url = url;
-           this.id = url;
-           this.name = url.substring(url.lastIndexOf("/") + 1);
-    }
-   
+    /**
+     * @param url  下载地址
+     * @param name 文件名称（带后缀）
+     */
     public DownloadEntry(String url, String name) {
-           this.url = url;
-           this.id = url;
-           this.name = name;
+        this.url = url;
+        this.id = url;
+        this.name = name;
+        this.filePath = QuietDownloader.getImpl().getConfigs().getDownloadFile(name).getAbsolutePath();
     }
-   
-    public DownloadEntry(String url, String id, String name) {
-           this.url = url;
-           this.id = id;
-           this.name = name;
-     }
        
     // ... 省略代码
     
@@ -220,12 +193,17 @@ public class DownloadEntry implements Serializable {
 - `DownloadEntry` 实体类重写其 equals 以及 hashCode 方法，使用其 id hashCode 来作为其标准
 - `QuietDownloader` 内部使用DownloadEntry实体类进行关联
 - `QuietDownEntry`的`name`属性最终作为下载文件名称  
+- 如果自定义了`downloadConfig.setDownloadDir()`下载位置注意申请读写权限
 
 
 
 ### TODO
  - 重试机制
  - 拦截器实现
+ 
+
+ 
+---
 
 ## 版本历史
 
@@ -236,8 +214,7 @@ public class DownloadEntry implements Serializable {
   - [fix Issues5](https://github.com/xwdz/QuietDownload/issues/5)
 
 ### v1.0.1
-  - `QuietConigs`提供自定义下载目录
-  - `QuietDownloader` 新增`queryEntryByIdForQueue()`Api
+  - `DownloadConfig`提供自定义下载目录
   - [Fix Issues3](https://github.com/xwdz/QuietDownload/issues/3)
 
 ### v0.0.6

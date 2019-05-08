@@ -99,7 +99,7 @@ class DataChanger extends Observable {
         return mOperatedEntries.containsValue(id);
     }
 
-    void deleteDownloadEntry(String id) {
+    void deleteById(String id) {
         checkContext(mContext);
 
         synchronized (LOCK) {

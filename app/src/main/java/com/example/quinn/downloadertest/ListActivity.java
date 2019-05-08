@@ -59,7 +59,7 @@ public class ListActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mQuietDownloader = QuietDownloader.get();
+        mQuietDownloader = QuietDownloader.getImpl();
         setContentView(R.layout.activity_list);
 
         mDownloadEntries.add(new DownloadEntry("https://dldir1.qq.com/weixin/android/weixin673android1360.apk", "微信Apk.apk"));

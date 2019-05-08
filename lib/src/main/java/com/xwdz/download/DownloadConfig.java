@@ -35,7 +35,7 @@ public class DownloadConfig {
     /**
      * 最大下载线程数
      **/
-    private int mMaxDownloadThreads = 5;
+    private int mMaxDownloadThreads = 3;
     /**
      * 下载文件夹
      **/

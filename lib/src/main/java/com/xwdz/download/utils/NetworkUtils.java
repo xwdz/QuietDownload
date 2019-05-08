@@ -56,7 +56,7 @@ public class NetworkUtils {
 				return pwrMgr.isScreenOn();
 			}
 		} catch (Throwable t) {
-			LOG.e(TAG, "get screen status failed("
+			LOG.e(TAG, "getImpl screen status failed("
 					+ t.getClass().getSimpleName() + "): " + t.getMessage());
 		}
 
@@ -75,7 +75,7 @@ public class NetworkUtils {
 			NetworkInfo info = connMgr.getActiveNetworkInfo();
 			return ((null != info) && info.isAvailable());
 		} catch (Throwable t) {
-			LOG.e(TAG, "get active network info failed(Throwable): " + t.getMessage());
+			LOG.e(TAG, "getImpl active network info failed(Throwable): " + t.getMessage());
 		}
 
 		return false;
@@ -146,7 +146,7 @@ public class NetworkUtils {
 				}
 			}
 		} catch (Throwable t) {
-			LOG.e(TAG, "get network type failed(" + t.getClass().getSimpleName()
+			LOG.e(TAG, "getImpl network type failed(" + t.getClass().getSimpleName()
 					+ "): " + t.getMessage());
 		}
 

@@ -59,7 +59,7 @@ class DownloadThread implements Runnable {
         this.mDestFile = destFile;
         this.mListener = listener;
         isSingleDownload = startPos == 0 && endPos == 0;
-        mDownloadConfig = QuietDownloader.get().getConfigs();
+        mDownloadConfig = QuietDownloader.getImpl().getConfigs();
     }
 
     @Override

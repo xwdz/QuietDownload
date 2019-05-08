@@ -22,7 +22,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 /**
- * @author xwdz(xwdz9989@gmail.com)
+ * @author xwdz(xwdz9989 @ gmail.com)
  */
 public class ConnectThread implements Runnable {
 
@@ -42,8 +42,9 @@ public class ConnectThread implements Runnable {
         try {
             connection = (HttpURLConnection) new URL(mUrl).openConnection();
             connection.setRequestMethod("GET");
-            connection.setConnectTimeout(QuietDownloader.getImpl().getConfigs().getConnTimeMillis());
-            connection.setReadTimeout(QuietDownloader.getImpl().getConfigs().getReadTimeoutMillis());
+            connection.setRequestProperty("Connection", "close");
+            connection.setConnectTimeout(QuietDownloader.get().getConfigs().getConnTimeMillis());
+            connection.setReadTimeout(QuietDownloader.get().getConfigs().getReadTimeoutMillis());
             int responseCode = connection.getResponseCode();
             int contentLength = connection.getContentLength();
             boolean isSupportRange = false;

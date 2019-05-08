@@ -49,7 +49,7 @@ class DownloadDBManager {
         mDBHelper = new DownloadDBHelper(context.getApplicationContext());
     }
 
-    public synchronized void newOrUpdate(DownloadEntry downloadEntry) {
+    synchronized void newOrUpdate(DownloadEntry downloadEntry) {
         try {
             Dao<DownloadEntry, String> dao = mDBHelper.getDao(DownloadEntry.class);
             dao.createOrUpdate(downloadEntry);
@@ -58,7 +58,7 @@ class DownloadDBManager {
         }
     }
 
-    public synchronized ArrayList<DownloadEntry> queryAll() {
+    synchronized ArrayList<DownloadEntry> queryAll() {
         Dao<DownloadEntry, String> dao;
         try {
             dao = mDBHelper.getDao(DownloadEntry.class);
@@ -69,7 +69,7 @@ class DownloadDBManager {
         }
     }
 
-    public synchronized DownloadEntry queryById(String id) {
+    synchronized DownloadEntry queryById(String id) {
         try {
             Dao<DownloadEntry, String> dao = mDBHelper.getDao(DownloadEntry.class);
             return dao.queryForId(id);
@@ -83,7 +83,7 @@ class DownloadDBManager {
         return mDBHelper.getDao(DownloadEntry.class);
     }
 
-    public synchronized int deleteById(String id) {
+    synchronized int deleteById(String id) {
         Dao<DownloadEntry, String> dao;
         try {
             dao = mDBHelper.getDao(DownloadEntry.class);

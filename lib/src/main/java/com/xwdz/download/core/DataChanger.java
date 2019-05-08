@@ -25,18 +25,20 @@ import java.util.Observable;
 
 
 /**
- * @author xwdz(xwdz9989@gmail.com)
+ * @author xwdz(xwdz9989 @ gmail.com)
  */
 class DataChanger extends Observable {
+
 
     private static class HolderClass {
         private static final DataChanger INSTANCE = new DataChanger();
     }
 
-    public static DataChanger getImpl() {
+    static DataChanger getImpl() {
         return HolderClass.INSTANCE;
     }
 
+    private final Object LOCK = new Object();
 
     private Context mContext;
     private LinkedHashMap<String, DownloadEntry> mOperatedEntries;
@@ -46,15 +48,17 @@ class DataChanger extends Observable {
         mOperatedEntries = new LinkedHashMap<>();
     }
 
-    public void initContext(Context context) {
+    void initContext(Context context) {
         this.mContext = context;
     }
 
 
-    public void postNotifyStatus(DownloadEntry downloadEntry) {
+    void postNotifyStatus(DownloadEntry downloadEntry) {
         checkContext(mContext);
 
-        mOperatedEntries.put(downloadEntry.id, downloadEntry);
+        synchronized (LOCK) {
+            mOperatedEntries.put(downloadEntry.id, downloadEntry);
+        }
 
         DownloadDBManager.getImpl().newOrUpdate(downloadEntry);
 
@@ -62,41 +66,60 @@ class DataChanger extends Observable {
         notifyObservers(downloadEntry);
     }
 
-    public ArrayList<DownloadEntry> queryAllRecoverableEntries() {
-        ArrayList<DownloadEntry> mRecoverableEntries = null;
+    ArrayList<DownloadEntry> queryAllRecoverableEntries() {
+        ArrayList<DownloadEntry> recoverableEntries = null;
         for (Map.Entry<String, DownloadEntry> entry : mOperatedEntries.entrySet()) {
-            if (entry.getValue().status == DownloadEntry.DownloadStatus.PAUSED) {
-                if (mRecoverableEntries == null) {
-                    mRecoverableEntries = new ArrayList<>();
+            if (entry.getValue().status == DownloadEntry.Status.PAUSED) {
+                if (recoverableEntries == null) {
+                    recoverableEntries = new ArrayList<>();
                 }
-                mRecoverableEntries.add(entry.getValue());
+                recoverableEntries.add(entry.getValue());
             }
         }
-        return mRecoverableEntries;
+        return recoverableEntries;
     }
 
-    public DownloadEntry queryDownloadEntryById(String id) {
-        return mOperatedEntries.get(id);
+    DownloadEntry queryById(String id) {
+        final DownloadEntry downloadEntry = mOperatedEntries.get(id);
+        if (downloadEntry == null) {
+            return DownloadDBManager.getImpl().queryById(id);
+        } else {
+            return downloadEntry;
+        }
     }
 
 
-    public void addToOperatedEntryMap(String key, DownloadEntry value) {
-        mOperatedEntries.put(key, value);
+    void addToOperatedEntryMap(String key, DownloadEntry value) {
+        synchronized (LOCK) {
+            mOperatedEntries.put(key, value);
+        }
     }
 
-    public DownloadEntry queryDownloadEntryForQueue(String id) {
-        return mOperatedEntries.get(id);
-    }
-
-    public boolean containsDownloadEntry(String id) {
+    boolean contains(String id) {
         return mOperatedEntries.containsValue(id);
     }
 
-    public void deleteDownloadEntry(String id) {
+    void deleteDownloadEntry(String id) {
         checkContext(mContext);
 
-        mOperatedEntries.remove(id);
+        synchronized (LOCK) {
+            mOperatedEntries.remove(id);
+        }
+
         DownloadDBManager.getImpl().deleteById(id);
+    }
+
+    ArrayList<DownloadEntry> queryAll() {
+        if (mOperatedEntries == null || mOperatedEntries.isEmpty()) {
+            return DownloadDBManager.getImpl().queryAll();
+        }
+        return new ArrayList<>(mOperatedEntries.values());
+
+    }
+
+    void newOrUpdate(DownloadEntry downloadEntry) {
+        DownloadDBManager.getImpl().newOrUpdate(downloadEntry);
+
     }
 
 

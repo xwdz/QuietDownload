@@ -18,7 +18,6 @@ package com.example.quinn.downloadertest;
 
 import android.app.Application;
 
-import com.xwdz.download.DownloadConfig;
 import com.xwdz.download.core.QuietDownloader;
 
 /**
@@ -32,8 +31,9 @@ public class App extends Application {
     public void onCreate() {
         super.onCreate();
 
-        QuietDownloader.getImpl().bindContext(this);
-        QuietDownloader.getImpl().bindService();
+        QuietDownloader.get().bindContext(this);
+        QuietDownloader.get().startService();
+
     }
 
 }

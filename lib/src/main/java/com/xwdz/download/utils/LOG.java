@@ -26,7 +26,7 @@ import com.xwdz.download.core.QuietDownloader;
 public class LOG {
 
     public static final String TAG = "xwdz_downloader";
-    private static final boolean DEBUG = QuietDownloader.getImpl().getConfigs().isDebug;
+    private static final boolean DEBUG = QuietDownloader.get().getConfigs().isDebug;
 
     public static void d(String msg) {
         if (DEBUG)

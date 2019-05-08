@@ -27,7 +27,6 @@ import android.widget.TextView;
 import com.xwdz.download.core.QuietDownloader;
 import com.xwdz.download.core.DownloadEntry;
 import com.xwdz.download.notify.DataUpdatedWatcher;
-import com.xwdz.download.utils.LOG;
 
 public class AppDetailActivity extends AppCompatActivity {
 
@@ -36,11 +35,13 @@ public class AppDetailActivity extends AppCompatActivity {
     private AppEntry mAppEntry;
     private TextView mTextView;
     private ProgressBar mProgressBar;
+    private TextView mLog;
+
+
     private DataUpdatedWatcher watcher = new DataUpdatedWatcher() {
 
         @Override
         public void notifyUpdate(DownloadEntry data) {
-            LOG.w(LOG.TAG, "watcher:" + data.toString());
             if (data.id.equals(entry.id)) {
                 entry = data;
                 initializeData();
@@ -55,15 +56,12 @@ public class AppDetailActivity extends AppCompatActivity {
 
         mTextView = findViewById(R.id.text);
         mProgressBar = findViewById(R.id.progressBar);
+        mLog = findViewById(R.id.log);
+
 
         mAppEntry = (AppEntry) getIntent().getSerializableExtra("url");
-        mDownloadManager = QuietDownloader.getImpl();
-        entry = mDownloadManager.queryById(mAppEntry.url) == null ? mDownloadManager.queryById(mAppEntry.url) : mAppEntry.generateDownloadEntry();
-
-
-        if (entry.status != DownloadEntry.DownloadStatus.COMPLETED) {
-            mDownloadManager.addDownload(entry);
-        }
+        mDownloadManager = QuietDownloader.get();
+        entry = mDownloadManager.queryById(mAppEntry.url) == null ? mAppEntry.generateDownloadEntry() : mDownloadManager.queryById(mAppEntry.url);
 
         initializeData();
     }
@@ -73,6 +71,9 @@ public class AppDetailActivity extends AppCompatActivity {
                 + Formatter.formatShortFileSize(getApplicationContext(), entry.currentLength)
                 + "/" + Formatter.formatShortFileSize(getApplicationContext(), entry.totalLength));
         float length = entry.currentLength * 1.0f / entry.totalLength;
+
+        mLog.setText(entry.toString());
+
         int percent = (int) (length * 100);
         mProgressBar.setProgress(percent);
     }

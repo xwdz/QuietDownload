@@ -43,7 +43,7 @@ public class DownloadConfig {
     /**
      * 事件间隔
      **/
-    private int mMinOperateInterval = 1000;
+    private int mMinOperateInterval = 800;
     /**
      * 自动恢复下载
      **/

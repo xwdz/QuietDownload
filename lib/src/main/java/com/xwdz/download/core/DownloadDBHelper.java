@@ -24,11 +24,13 @@ import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
 
 import java.sql.SQLException;
+import java.util.Collections;
+import java.util.HashSet;
 
 class DownloadDBHelper extends OrmLiteSqliteOpenHelper {
 
     private static final String DB_NAME = "xwdz_downloader";
-    private static final int DB_VERSION = 3;
+    private static final int DB_VERSION = 2;
 
 
     public DownloadDBHelper(Context context) {

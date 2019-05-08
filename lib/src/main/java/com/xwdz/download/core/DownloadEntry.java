@@ -41,16 +41,15 @@ public class DownloadEntry implements Serializable, Cloneable {
     @DatabaseField
     public int totalLength;
     @DatabaseField
-    public DownloadStatus status = DownloadStatus.IDLE;
+    public Status status = Status.IDLE;
     @DatabaseField
     public boolean isSupportRange = false;
     @DatabaseField(dataType = DataType.SERIALIZABLE)
     public HashMap<Integer, Integer> ranges;
     @DatabaseField
-    public String local;
+    public String filePath;
 
-
-    public DownloadEntry() {
+    public DownloadEntry(){
 
     }
 
@@ -62,13 +61,13 @@ public class DownloadEntry implements Serializable, Cloneable {
         this.url = url;
         this.id = url;
         this.name = name;
-        this.local = QuietDownloader.getImpl().getConfigs().getDownloadFile(name).getAbsolutePath();
+        this.filePath = QuietDownloader.get().getConfigs().getDownloadFile(name).getAbsolutePath();
     }
 
     public void reset() {
         currentLength = 0;
         ranges = null;
-        File file = QuietDownloader.getImpl().getConfigs().getDownloadFile(url);
+        File file = QuietDownloader.get().getConfigs().getDownloadFile(url);
         if (file.exists()) {
             file.delete();
         }
@@ -86,7 +85,7 @@ public class DownloadEntry implements Serializable, Cloneable {
     }
 
 
-    public enum DownloadStatus {
+    public enum Status {
         //空闲
         IDLE,
         // 等待
@@ -117,7 +116,7 @@ public class DownloadEntry implements Serializable, Cloneable {
                 ", totalLength=" + totalLength +
                 ", status=" + status +
                 ", isSupportRange=" + isSupportRange +
-                ", local='" + local + '\'' +
+                ", filePath='" + filePath + '\'' +
                 '}';
     }
 

@@ -59,29 +59,17 @@ public class ListActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mQuietDownloader = QuietDownloader.getImpl();
+        mQuietDownloader = QuietDownloader.get();
         setContentView(R.layout.activity_list);
 
         mDownloadEntries.add(new DownloadEntry("https://dldir1.qq.com/weixin/android/weixin673android1360.apk", "微信Apk.apk"));
-        mDownloadEntries.add(new DownloadEntry("http://seopic.699pic.com/photo/50035/0520.jpg_wh1200.jpg", "这是一张图片.jpg"));
-//        mDownloadEntries.add(new DownloadEntry("http://shouji.360tpcdn.com/150720/789cd3f2facef6b27004d9f813599463/com.mfw.roadbook_147.apk"));
-//        mDownloadEntries.add(new DownloadEntry("http://shouji.360tpcdn.com/150810/10805820b9fbe1eeda52be289c682651/com.qihoo.vpnmaster_3019020.apk"));
-//        mDownloadEntries.add(new DownloadEntry("http://shouji.360tpcdn.com/150730/580642ffcae5fe8ca311c53bad35bcf2/com.taobao.trip_3001032.apk"));
-//        mDownloadEntries.add(new DownloadEntry("http://shouji.360tpcdn.com/150807/42ac3ad85a189125701e69ccff36ad7a/com.eg.android.AlipayGphone_78.apk"));
-//        mDownloadEntries.add(new DownloadEntry("http://shouji.360tpcdn.com/150813/9e775b5afb66feb960941cd8879af0b8/com.sankuai.meituan_291.apk"));
-//        mDownloadEntries.add(new DownloadEntry("http://shouji.360tpcdn.com/150706/5a9bec48b764a892df801424278a4285/com.mt.mtxx.mtxx_434.apk"));
-//        mDownloadEntries.add(new DownloadEntry("http://shouji.360tpcdn.com/150707/2ef5e16e0b8b3135aa714ad9b56b9a3d/com.happyelements.AndroidAnimal_25.apk"));
-//        mDownloadEntries.add(new DownloadEntry("http://shouji.360tpcdn.com/150716/aea8ca0e6617b0989d3dcce0bb9877d5/com.cmge.xianjian.a360_30.apk"));
-        DownloadEntry entry = null;
-        DownloadEntry realEntry = null;
-        for (int i = 0; i < mDownloadEntries.size(); i++) {
-            entry = mDownloadEntries.get(i);
-            realEntry = mQuietDownloader.queryById(entry.id);
-            if (realEntry != null) {
-                mDownloadEntries.remove(i);
-                mDownloadEntries.add(i, realEntry);
-            }
-        }
+        mDownloadEntries.add(new DownloadEntry("http://seopic.699pic.com/photo/50035/0520.jpg_wh1200.jpg", "我是一张图片.jpg"));
+        mDownloadEntries.add(new DownloadEntry("http://shouji.360tpcdn.com/150810/10805820b9fbe1eeda52be289c682651/com.qihoo.vpnmaster_3019020.apk", "vpn.apk"));
+        mDownloadEntries.add(new DownloadEntry("http://shouji.360tpcdn.com/150730/580642ffcae5fe8ca311c53bad35bcf2/com.taobao.trip_3001032.apk", "是一个apk.apk"));
+        mDownloadEntries.add(new DownloadEntry("http://shouji.360tpcdn.com/150807/42ac3ad85a189125701e69ccff36ad7a/com.eg.android.AlipayGphone_78.apk", "还是一个Apk.apk"));
+        mDownloadEntries.add(new DownloadEntry("http://shouji.360tpcdn.com/150707/2ef5e16e0b8b3135aa714ad9b56b9a3d/com.happyelements.AndroidAnimal_25.apk", "大家好我还是Apk.apk"));
+        mDownloadEntries.add(new DownloadEntry("http://img.tukuppt.com/video_show/2405179/00/01/53/5b45647bf18c3.mp4", "我是一段视频.mp4"));
+
         mDownloadLsv = (ListView) findViewById(R.id.mDownloadLsv);
         adapter = new DownloadAdapter();
         mDownloadLsv.setAdapter(adapter);
@@ -91,7 +79,6 @@ public class ListActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         mQuietDownloader.addObserver(watcher);
-
     }
 
     @Override
@@ -143,10 +130,11 @@ public class ListActivity extends AppCompatActivity {
             holder.mDownloadBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (entry.status == DownloadEntry.DownloadStatus.IDLE
-                            || entry.status == DownloadEntry.DownloadStatus.CANCELLED
-                            || entry.status == DownloadEntry.DownloadStatus.PAUSED) {
-                        mQuietDownloader.addDownload(entry);
+                    if (entry.status == DownloadEntry.Status.IDLE
+                            || entry.status == DownloadEntry.Status.CANCELLED
+                            || entry.status == DownloadEntry.Status.PAUSED
+                            || entry.status == DownloadEntry.Status.ERROR) {
+                        mQuietDownloader.startDownload(entry);
                     }
                 }
             });
@@ -154,7 +142,7 @@ public class ListActivity extends AppCompatActivity {
             holder.mPause.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (entry.status == DownloadEntry.DownloadStatus.DOWNLOADING) {
+                    if (entry.status == DownloadEntry.Status.DOWNLOADING) {
                         mQuietDownloader.pause(entry);
                     }
                 }

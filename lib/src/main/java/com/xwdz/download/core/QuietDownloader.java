@@ -41,7 +41,7 @@ public class QuietDownloader {
         private static final QuietDownloader INSTANCE = new QuietDownloader();
     }
 
-    public static QuietDownloader getImpl() {
+    public static QuietDownloader get() {
         return Holder.INSTANCE;
     }
 
@@ -70,7 +70,7 @@ public class QuietDownloader {
     }
 
 
-    public void bindService() {
+    public void startService() {
         mInit = true;
         Intent intent = new Intent(mContext, DownloadService.class);
         if (Build.VERSION.SDK_INT >= 26) {
@@ -98,7 +98,7 @@ public class QuietDownloader {
     /**
      * 开始下载一个任务
      */
-    public void addDownload(DownloadEntry downloadEntry) {
+    public void startDownload(DownloadEntry downloadEntry) {
         if (!checkIfExecutable()) {
             return;
         }
@@ -199,12 +199,6 @@ public class QuietDownloader {
         return DownloadDBManager.getImpl().getDao();
     }
 
-    /**
-     * 从数据库中查询所有下载任务
-     */
-    public ArrayList<DownloadEntry> queryAll() {
-        return DownloadDBManager.getImpl().queryAll();
-    }
 
     /**
      * 删除一个任务从数据库中
@@ -229,8 +223,16 @@ public class QuietDownloader {
      * 查询当前队列中是否有该 DownloadEntry
      */
     public DownloadEntry queryById(String id) {
-        return mDataChanger.queryDownloadEntryForQueue(id);
+        return mDataChanger.queryById(id);
     }
+
+    /**
+     * 从数据库中查询所有下载任务
+     */
+    public ArrayList<DownloadEntry> queryAll() {
+        return mDataChanger.queryAll();
+    }
+
 
     public DownloadConfig getConfigs() {
         return mDownloadConfig;

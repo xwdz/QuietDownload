@@ -21,7 +21,7 @@ import com.xwdz.download.core.DownloadEntry;
 
 import java.io.Serializable;
 
-public class AppEntry implements Serializable{
+public class AppEntry implements Serializable {
     public String name;
     public String icon;
     public String size;
@@ -34,10 +34,6 @@ public class AppEntry implements Serializable{
     }
 
     public DownloadEntry generateDownloadEntry() {
-        DownloadEntry entry = new DownloadEntry();
-        entry.id = url;
-        entry.name = name;
-        entry.url = url;
-        return entry;
+        return new DownloadEntry(url, name);
     }
 }

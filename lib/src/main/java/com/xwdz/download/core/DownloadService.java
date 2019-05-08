@@ -32,6 +32,7 @@ import com.xwdz.download.utils.LOG;
 
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingDeque;
 
 /**
@@ -50,8 +51,7 @@ public class DownloadService extends Service {
     public static final int NOTIFY_ERROR = 6;
     public static final int NOTIFY_CONNECT_SUCCESSFUL = 7;
 
-    @SuppressLint("NewApi")
-    private ArrayMap<String, DownloadTaskManager> mDownloadingTasks = new ArrayMap<>();
+    private ConcurrentHashMap<String, DownloadTaskManager> mDownloadingTasks = new ConcurrentHashMap<>();
     private LinkedBlockingDeque<DownloadEntry> mWaitingQueue = new LinkedBlockingDeque<>();
     private DataChanger mDataChanger;
     private DownloadConfig mDownloadConfig;
@@ -71,7 +71,6 @@ public class DownloadService extends Service {
         }
     });
 
-    private DownloadDBManager mDownloadDBManager;
 
     private void checkNext(DownloadEntry obj) {
         mDownloadingTasks.remove(obj.id);
@@ -97,41 +96,40 @@ public class DownloadService extends Service {
 
         mDataChanger = DataChanger.getImpl();
         mDataChanger.initContext(this);
-        mDownloadConfig = QuietDownloader.getImpl().getConfigs();
-        mDownloadDBManager = DownloadDBManager.getImpl();
+        mDownloadConfig = QuietDownloader.get().getConfigs();
 
         initDownload();
     }
 
     private void initDownload() {
-        ArrayList<DownloadEntry> downloadEntrys = mDownloadDBManager.queryAll();
+        ArrayList<DownloadEntry> downloadEntrys = mDataChanger.queryAll();
         if (downloadEntrys != null) {
             for (DownloadEntry downloadEntry : downloadEntrys) {
 
-                if (downloadEntry.status == DownloadEntry.DownloadStatus.PAUSED) {
+                if (downloadEntry.status == DownloadEntry.Status.PAUSED) {
                     // todo 暂停的自动赋值恢复进度
                     LOG.d(TAG, "auto recover");
-//                    addDownload(downloadEntry);
+//                    startDownload(downloadEntry);
                 }
 
-                if (downloadEntry.status == DownloadEntry.DownloadStatus.DOWNLOADING
-                        || downloadEntry.status == DownloadEntry.DownloadStatus.WAITING) {
+                if (downloadEntry.status == DownloadEntry.Status.DOWNLOADING
+                        || downloadEntry.status == DownloadEntry.Status.WAITING) {
                     if (mDownloadConfig.isRecoverDownloadWhenStart()) {
                         if (downloadEntry.isSupportRange) {
-                            downloadEntry.status = DownloadEntry.DownloadStatus.PAUSED;
+                            downloadEntry.status = DownloadEntry.Status.PAUSED;
                         } else {
-                            downloadEntry.status = DownloadEntry.DownloadStatus.IDLE;
+                            downloadEntry.status = DownloadEntry.Status.IDLE;
                             downloadEntry.reset();
                         }
                         addDownload(downloadEntry);
                     } else {
                         if (downloadEntry.isSupportRange) {
-                            downloadEntry.status = DownloadEntry.DownloadStatus.PAUSED;
+                            downloadEntry.status = DownloadEntry.Status.PAUSED;
                         } else {
-                            downloadEntry.status = DownloadEntry.DownloadStatus.IDLE;
+                            downloadEntry.status = DownloadEntry.Status.IDLE;
                             downloadEntry.reset();
                         }
-                        mDownloadDBManager.newOrUpdate(downloadEntry);
+                        mDataChanger.newOrUpdate(downloadEntry);
                     }
                 }
                 mDataChanger.addToOperatedEntryMap(downloadEntry.id, downloadEntry);
@@ -150,8 +148,8 @@ public class DownloadService extends Service {
                 return START_STICKY;
             }
 
-            if (mDataChanger.containsDownloadEntry(downloadEntry.id)) {
-                downloadEntry = mDataChanger.queryDownloadEntryById(downloadEntry.id);
+            if (mDataChanger.contains(downloadEntry.id)) {
+                downloadEntry = mDataChanger.queryById(downloadEntry.id);
             }
             int action = intent.getIntExtra(Constants.KEY_DOWNLOAD_ACTION, -1);
             doAction(action, downloadEntry);
@@ -196,7 +194,7 @@ public class DownloadService extends Service {
     private void pauseAll() {
         while (mWaitingQueue.iterator().hasNext()) {
             DownloadEntry downloadEntry = mWaitingQueue.poll();
-            downloadEntry.status = DownloadEntry.DownloadStatus.PAUSED;
+            downloadEntry.status = DownloadEntry.Status.PAUSED;
             mDataChanger.postNotifyStatus(downloadEntry);
         }
 
@@ -210,7 +208,7 @@ public class DownloadService extends Service {
     private void addDownload(DownloadEntry downloadEntry) {
         if (mDownloadingTasks.size() >= mDownloadConfig.getMaxDownloadTasks()) {
             mWaitingQueue.offer(downloadEntry);
-            downloadEntry.status = DownloadEntry.DownloadStatus.WAITING;
+            downloadEntry.status = DownloadEntry.Status.WAITING;
             mDataChanger.postNotifyStatus(downloadEntry);
         } else {
             startDownload(downloadEntry);
@@ -223,7 +221,7 @@ public class DownloadService extends Service {
             task.cancel();
         } else {
             mWaitingQueue.remove(downloadEntry);
-            downloadEntry.status = DownloadEntry.DownloadStatus.CANCELLED;
+            downloadEntry.status = DownloadEntry.Status.CANCELLED;
             mDataChanger.postNotifyStatus(downloadEntry);
         }
     }
@@ -238,7 +236,7 @@ public class DownloadService extends Service {
             task.pause();
         } else {
             mWaitingQueue.remove(downloadEntry);
-            downloadEntry.status = DownloadEntry.DownloadStatus.PAUSED;
+            downloadEntry.status = DownloadEntry.Status.PAUSED;
             mDataChanger.postNotifyStatus(downloadEntry);
         }
     }

@@ -52,23 +52,22 @@ public class QuietDownloader {
 
     private static boolean mInit;
 
-    private Context mContext;
-    private long mLastOperatedTime = 0;
-    private DataChanger mDataChanger;
+    private Context        mContext;
+    private long           mLastOperatedTime = 0;
+    private DataChanger    mDataChanger;
     private DownloadConfig mDownloadConfig;
 
 
-    public void setDownloadConfig(DownloadConfig downloadConfig) {
-        this.mDownloadConfig = downloadConfig;
+    public void initializeConfig(Context context) {
+        initializeConfig(new DownloadConfig(context));
     }
 
-    public void setContext(Context context) {
-        this.mContext = context.getApplicationContext();
+    public void initializeConfig(DownloadConfig downloadConfig) {
+        this.mDownloadConfig = downloadConfig;
+        this.mContext = downloadConfig.getContext().getApplicationContext();
         this.mDownloadConfig = new DownloadConfig(mContext);
-        this.mDataChanger.initContext(mContext);
         DownloadDBManager.getImpl().initDBHelper(mContext);
     }
-
 
     public void startService() {
         mInit = true;
@@ -84,7 +83,7 @@ public class QuietDownloader {
      * @return 检查事件间隔时间
      */
     private boolean checkIfExecutable() {
-        long tmp = System.currentTimeMillis();
+        long    tmp               = System.currentTimeMillis();
         boolean isMinTimeInterval = tmp - mLastOperatedTime > mDownloadConfig.getMinOperateInterval();
         if (isMinTimeInterval && mInit) {
             mLastOperatedTime = tmp;

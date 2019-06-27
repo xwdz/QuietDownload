@@ -17,6 +17,7 @@
 package com.xwdz.download.core;
 
 import com.xwdz.download.DownloadConfig;
+import com.xwdz.download.utils.LOG;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -24,6 +25,7 @@ import java.io.InputStream;
 import java.io.RandomAccessFile;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author 黄兴伟 (xwdz9989@gamil.com)
@@ -34,19 +36,21 @@ class DownloadThread implements Runnable {
 
     private static final int BUFF_SIZE = 1024 * 8;
 
-    private final String mUrl;
-    private final int mStartPos;
-    private final int mEndPos;
-    private final File mDestFile;
-    private final DownloadListener mListener;
-    private final int mThreadIndex;
-    private final boolean isSingleDownload;
-    private DownloadEntry.Status mStatus;
+    private final String               mUrl;
+    private final int                  mStartPos;
+    private final int                  mEndPos;
+    private final File                 mDestFile;
+    private final DownloadListener     mListener;
+    private final int                  mThreadIndex;
+    private final boolean              isSingleDownload;
+    private       DownloadEntry.Status mStatus;
 
     private volatile boolean isPaused;
     private volatile boolean isCancelled;
     private volatile boolean isError;
     private volatile boolean isCompleted;
+
+    private final AtomicInteger mRetryCount = new AtomicInteger();
 
     private DownloadConfig mDownloadConfig;
 
@@ -65,11 +69,10 @@ class DownloadThread implements Runnable {
     @Override
     public void run() {
         //todo not impl retry
-        realRun();
+        doRunnable();
     }
 
-
-    private void realRun() {
+    private void doRunnable() {
         mStatus = DownloadEntry.Status.DOWNLOADING;
         HttpURLConnection connection = null;
         try {
@@ -82,18 +85,17 @@ class DownloadThread implements Runnable {
             connection.setReadTimeout(mDownloadConfig.getReadTimeoutMillis());
             connection.setRequestProperty("Connection", "close");
 
-
-            int responseCode = connection.getResponseCode();
-            RandomAccessFile raf = null;
-            FileOutputStream fos = null;
-            InputStream is = null;
+            int              responseCode = connection.getResponseCode();
+            RandomAccessFile raf          = null;
+            FileOutputStream fos          = null;
+            InputStream      is           = null;
             if (responseCode == HttpURLConnection.HTTP_PARTIAL) {
                 try {
                     raf = new RandomAccessFile(mDestFile, "rw");
                     raf.seek(mStartPos);
                     is = connection.getInputStream();
                     byte[] buffer = new byte[BUFF_SIZE];
-                    int len = -1;
+                    int    len    = -1;
 
                     while ((len = is.read(buffer)) != -1) {
                         raf.write(buffer, 0, len);
@@ -116,7 +118,7 @@ class DownloadThread implements Runnable {
                     fos = new FileOutputStream(mDestFile);
                     is = connection.getInputStream();
                     byte[] buffer = new byte[BUFF_SIZE];
-                    int len = -1;
+                    int    len    = -1;
 
                     while ((len = is.read(buffer)) != -1) {
                         fos.write(buffer, 0, len);
@@ -159,23 +161,41 @@ class DownloadThread implements Runnable {
                 connection.disconnect();
             }
 
-            if (isPaused) {
-                mStatus = DownloadEntry.Status.PAUSED;
-                mListener.onDownloadPaused(mThreadIndex);
-            } else if (isCancelled) {
-                mStatus = DownloadEntry.Status.CANCELLED;
-                mListener.onDownloadCancelled(mThreadIndex);
-            } else if (isError) {
-                mStatus = DownloadEntry.Status.ERROR;
-                mListener.onDownloadError(mThreadIndex, "error");
-            } else {
-                mStatus = DownloadEntry.Status.COMPLETED;
-                mListener.onDownloadCompleted(mThreadIndex);
+            if (isError) {
+                if (mRetryCount.getAndIncrement() < mDownloadConfig.getMaxRetryCount()) {
+                    LOG.w(TAG, "RetryCount:" + mRetryCount.get());
+                    try {
+                        Thread.sleep(mDownloadConfig.getRetryIntervalMillis());
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    reset();
+                    doRunnable();
+                }
             }
+
+
+//            if (isPaused) {
+//                mStatus = DownloadEntry.Status.PAUSED;
+//                mListener.onDownloadPaused(mThreadIndex);
+//            } else if (isCancelled) {
+//                mStatus = DownloadEntry.Status.CANCELLED;
+//                mListener.onDownloadCancelled(mThreadIndex);
+//            } else if (isError) {
+//                mStatus = DownloadEntry.Status.ERROR;
+//                mListener.onDownloadError(mThreadIndex, "error");
+//            } else {
+//                mStatus = DownloadEntry.Status.COMPLETED;
+//                mListener.onDownloadCompleted(mThreadIndex);
+//            }
         }
     }
 
-
+    private void reset() {
+        isError = false;
+        isCancelled = false;
+        isCompleted = false;
+    }
 
     public boolean isRunning() {
         return mStatus == DownloadEntry.Status.DOWNLOADING;

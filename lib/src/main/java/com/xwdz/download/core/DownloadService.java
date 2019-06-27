@@ -23,7 +23,9 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
+import android.support.v4.app.NotificationCompat;
 
+import com.example.lib.R;
 import com.xwdz.download.DownloadConfig;
 import com.xwdz.download.utils.Constants;
 import com.xwdz.download.utils.LOG;
@@ -40,19 +42,19 @@ public class DownloadService extends Service {
 
     private static final String TAG = DownloadService.class.getSimpleName();
 
-
-    public static final int NOTIFY_DOWNLOADING = 1;
-    public static final int NOTIFY_UPDATING = 2;
+    public static final int NOTIFY_DOWNLOADING         = 1;
+    public static final int NOTIFY_UPDATING            = 2;
     public static final int NOTIFY_PAUSED_OR_CANCELLED = 3;
-    public static final int NOTIFY_COMPLETED = 4;
-    public static final int NOTIFY_CONNECTING = 5;
-    public static final int NOTIFY_ERROR = 6;
-    public static final int NOTIFY_CONNECT_SUCCESSFUL = 7;
+    public static final int NOTIFY_COMPLETED           = 4;
+    public static final int NOTIFY_CONNECTING          = 5;
+    public static final int NOTIFY_ERROR               = 6;
+    public static final int NOTIFY_CONNECT_SUCCESSFUL  = 7;
 
     private ConcurrentHashMap<String, DownloadTaskManager> mDownloadingTasks = new ConcurrentHashMap<>();
-    private LinkedBlockingDeque<DownloadEntry> mWaitingQueue = new LinkedBlockingDeque<>();
-    private DataChanger mDataChanger;
-    private DownloadConfig mDownloadConfig;
+    private LinkedBlockingDeque<DownloadEntry>             mWaitingQueue     = new LinkedBlockingDeque<>();
+    private LinkedBlockingDeque<DownloadEntry>             mWifiQueue        = new LinkedBlockingDeque<>();
+    private DataChanger                                    mDataChanger;
+    private DownloadConfig                                 mDownloadConfig;
 
     private Handler mHandler = new Handler(new Handler.Callback() {
         @Override
@@ -88,12 +90,13 @@ public class DownloadService extends Service {
     public void onCreate() {
         super.onCreate();
         LOG.d(TAG, "downloader service Create ");
-        if (Build.VERSION.SDK_INT >= 26) {
-            startForeground(1, new Notification());
-        }
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//            Notification.Builder notificationBuilder = new Notification.Builder(this, "xwd_download");
+//            notificationBuilder.setOngoing(true);
+//            startForeground(101, notificationBuilder.build());
+//        }
 
         mDataChanger = DataChanger.getImpl();
-        mDataChanger.initContext(this);
         mDownloadConfig = QuietDownloader.getImpl().getConfigs();
 
         initDownload();

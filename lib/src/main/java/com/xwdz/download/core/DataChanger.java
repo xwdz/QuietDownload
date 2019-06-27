@@ -25,7 +25,7 @@ import java.util.Observable;
 
 
 /**
- * @author xwdz(xwdz9989 @ gmail.com)
+ * @author xwdz (xwdz9989 @gmail.com)
  */
 class DataChanger extends Observable {
 
@@ -40,7 +40,6 @@ class DataChanger extends Observable {
 
     private final Object LOCK = new Object();
 
-    private Context mContext;
     private LinkedHashMap<String, DownloadEntry> mOperatedEntries;
 
 
@@ -48,13 +47,9 @@ class DataChanger extends Observable {
         mOperatedEntries = new LinkedHashMap<>();
     }
 
-    void initContext(Context context) {
-        this.mContext = context;
-    }
 
 
     void postNotifyStatus(DownloadEntry downloadEntry) {
-        checkContext(mContext);
 
         synchronized (LOCK) {
             mOperatedEntries.put(downloadEntry.id, downloadEntry);
@@ -100,7 +95,6 @@ class DataChanger extends Observable {
     }
 
     void deleteById(String id) {
-        checkContext(mContext);
 
         synchronized (LOCK) {
             mOperatedEntries.remove(id);

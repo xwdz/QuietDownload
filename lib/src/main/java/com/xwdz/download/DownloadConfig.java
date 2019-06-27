@@ -31,28 +31,34 @@ public class DownloadConfig {
     /**
      * 最大同时下载任务数
      **/
-    private int mMaxDownloadTasks = 3;
+    private int     mMaxDownloadTasks         = 3;
     /**
      * 最大下载线程数
      **/
-    private int mMaxDownloadThreads = 3;
+    private int     mMaxDownloadThreads       = 3;
     /**
      * 下载文件夹
      **/
-    private File mDownloadDir = null;
+    private File    mDownloadDir              = null;
     /**
      * 事件间隔
      **/
-    private int mMinOperateInterval = 800;
+    private int     mMinOperateInterval       = 800;
     /**
      * 自动恢复下载
      **/
     private boolean mRecoverDownloadWhenStart = true;
 
-    //  todo: no imp
-    private int mMaxRetryCount = 2;
+    private long mMaxFileLength = 50 * 1024 * 1024;
+
+    private int mMaxRetryCount = 3;
+
+    private long mRetryIntervalMillis = 1500;
+
+    private Context mContext;
 
     public DownloadConfig(Context context) {
+        mContext = context;
         mDownloadDir = getCacheDir(context, "quietDownloader");
         checkDownloadFileExists(mDownloadDir);
     }
@@ -85,6 +91,15 @@ public class DownloadConfig {
         return this;
     }
 
+
+    public long getMaxFileLength() {
+        return mMaxFileLength;
+    }
+
+    public void setMaxFileLength(long maxFileLength) {
+        mMaxFileLength = maxFileLength;
+    }
+
     private void checkDownloadFileExists(File file) {
         mDownloadDir = file;
         if (!mDownloadDir.exists()) {
@@ -104,6 +119,14 @@ public class DownloadConfig {
     public DownloadConfig setMinOperateInterval(int minOperateInterval) {
         this.mMinOperateInterval = minOperateInterval;
         return this;
+    }
+
+    public Context getContext() {
+        return mContext;
+    }
+
+    public void setContext(Context context) {
+        mContext = context;
     }
 
     public boolean isRecoverDownloadWhenStart() {
@@ -128,7 +151,7 @@ public class DownloadConfig {
         return new File(mDownloadDir, name);
     }
 
-    private int mConnTimeMillis = 30 * 1000;
+    private int mConnTimeMillis    = 30 * 1000;
     private int mReadTimeoutMillis = 30 * 1000;
 
     public int getConnTimeMillis() {
@@ -149,6 +172,13 @@ public class DownloadConfig {
         return this;
     }
 
+    public long getRetryIntervalMillis() {
+        return mRetryIntervalMillis;
+    }
+
+    public void setRetryIntervalMillis(long retryIntervalMillis) {
+        mRetryIntervalMillis = retryIntervalMillis;
+    }
 
     private File getCacheDir(Context context, String uniqueName) {
         String cachePath;

@@ -94,7 +94,7 @@ public class DownloadTaskManager implements ConnectThread.ConnectListener, Downl
             mDownloadEntry.status = (DownloadEntry.Status.CONNECTING);
             notifyUpdate(mDownloadEntry, DownloadService.NOTIFY_CONNECTING);
 
-            ConnectThread mConnectThread = new ConnectThread(mDownloadEntry.url, this);
+            ConnectThread mConnectThread = new ConnectThread(mDownloadConfig,mDownloadEntry.url, this);
             QuietExecutors.execute(mConnectThread);
         }
     }

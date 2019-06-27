@@ -17,20 +17,29 @@
 package com.xwdz.download.core;
 
 
-import java.io.IOException;
+import com.xwdz.download.DownloadConfig;
+import com.xwdz.download.utils.LOG;
+
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * @author xwdz(xwdz9989 @ gmail.com)
+ * @author xwdz (xwdz9989@gmail.com)
  */
 public class ConnectThread implements Runnable {
 
-    private final String mUrl;
-    private final ConnectListener mListener;
-    private volatile boolean isRunning;
+    private static final String TAG = ConnectThread.class.getSimpleName();
 
-    public ConnectThread(String url, ConnectListener listener) {
+    private final    String          mUrl;
+    private final    ConnectListener mListener;
+    private volatile boolean         isRunning;
+    private volatile boolean         isError;
+    private final    AtomicInteger   mRetryCount = new AtomicInteger();
+    private          DownloadConfig  mDownloadConfig;
+
+    public ConnectThread(DownloadConfig downloadConfig, String url, ConnectListener listener) {
+        this.mDownloadConfig = downloadConfig;
         this.mUrl = url;
         this.mListener = listener;
     }
@@ -45,8 +54,8 @@ public class ConnectThread implements Runnable {
             connection.setRequestProperty("Connection", "close");
             connection.setConnectTimeout(QuietDownloader.getImpl().getConfigs().getConnTimeMillis());
             connection.setReadTimeout(QuietDownloader.getImpl().getConfigs().getReadTimeoutMillis());
-            int responseCode = connection.getResponseCode();
-            int contentLength = connection.getContentLength();
+            int     responseCode   = connection.getResponseCode();
+            int     contentLength  = connection.getContentLength();
             boolean isSupportRange = false;
             if (responseCode == HttpURLConnection.HTTP_OK) {
                 String ranges = connection.getHeaderField("Accept-Ranges");
@@ -58,13 +67,26 @@ public class ConnectThread implements Runnable {
                 mListener.onConnectError("server ERROR:" + responseCode);
             }
             isRunning = false;
-        } catch (IOException e) {
+        } catch (Throwable e) {
+            isError = true;
             isRunning = false;
             mListener.onConnectError(e.getMessage());
         } finally {
             if (connection != null) {
                 connection.disconnect();
             }
+            if (isError) {
+                if (mRetryCount.getAndIncrement() < mDownloadConfig.getMaxRetryCount()) {
+                    LOG.w(TAG, "RetryCount:" + mRetryCount.get());
+                    try {
+                        Thread.sleep(mDownloadConfig.getRetryIntervalMillis());
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    run();
+                }
+            }
+
         }
     }
 

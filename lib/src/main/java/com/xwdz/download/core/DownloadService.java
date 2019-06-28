@@ -29,6 +29,7 @@ import com.example.lib.R;
 import com.xwdz.download.DownloadConfig;
 import com.xwdz.download.utils.Constants;
 import com.xwdz.download.utils.LOG;
+import com.xwdz.download.utils.NetworkUtils;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -89,7 +90,7 @@ public class DownloadService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        LOG.d(TAG, "downloader service Create ");
+        LOG.d(TAG, "downloader service created. ");
 //        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 //            Notification.Builder notificationBuilder = new Notification.Builder(this, "xwd_download");
 //            notificationBuilder.setOngoing(true);

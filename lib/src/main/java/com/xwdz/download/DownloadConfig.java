@@ -49,11 +49,13 @@ public class DownloadConfig {
      **/
     private boolean mRecoverDownloadWhenStart = true;
 
+    private boolean mOpenRetry = false;
+
     private long mMaxFileLength = 50 * 1024 * 1024;
 
     private int mMaxRetryCount = 3;
 
-    private long mRetryIntervalMillis = 1500;
+    private long mRetryIntervalMillis = 2500;
 
     private Context mContext;
 
@@ -145,6 +147,14 @@ public class DownloadConfig {
     public DownloadConfig setMaxRetryCount(int maxRetryCount) {
         this.mMaxRetryCount = maxRetryCount;
         return this;
+    }
+
+    public boolean isOpenRetry() {
+        return mOpenRetry;
+    }
+
+    public void setOpenRetry(boolean openRetry) {
+        mOpenRetry = openRetry;
     }
 
     public File getDownloadFile(String name) {

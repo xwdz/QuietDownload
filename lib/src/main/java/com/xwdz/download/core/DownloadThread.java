@@ -26,6 +26,7 @@ import java.io.RandomAccessFile;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.logging.Logger;
 
 /**
  * @author 黄兴伟 (xwdz9989@gamil.com)
@@ -36,19 +37,21 @@ class DownloadThread implements Runnable {
 
     private static final int BUFF_SIZE = 1024 * 8;
 
-    private final String               mUrl;
-    private final int                  mStartPos;
-    private final int                  mEndPos;
-    private final File                 mDestFile;
-    private final DownloadListener     mListener;
-    private final int                  mThreadIndex;
-    private final boolean              isSingleDownload;
-    private       DownloadEntry.Status mStatus;
+    private final    String               mUrl;
+    private volatile int                  mStartPos;
+    private volatile int                  mEndPos;
+    private volatile int                  mThreadIndex;
+    private volatile DownloadEntry.Status mStatus;
+    private volatile boolean              isSingleDownload;
 
-    private volatile boolean isPaused;
-    private volatile boolean isCancelled;
-    private volatile boolean isError;
-    private volatile boolean isCompleted;
+    private final File             mDestFile;
+    private final DownloadListener mListener;
+
+    private volatile boolean   isPaused;
+    private volatile boolean   isCancelled;
+    private volatile boolean   isError;
+    private volatile boolean   isCompleted;
+    private volatile Throwable mThrowable;
 
     private final AtomicInteger mRetryCount = new AtomicInteger();
 
@@ -62,17 +65,17 @@ class DownloadThread implements Runnable {
         this.mEndPos = endPos;
         this.mDestFile = destFile;
         this.mListener = listener;
-        isSingleDownload = startPos == 0 && endPos == 0;
-        mDownloadConfig = QuietDownloader.getImpl().getConfigs();
+        this.isSingleDownload = startPos == 0 && endPos == 0;
+        this.mDownloadConfig = QuietDownloader.getImpl().getConfigs();
     }
 
     @Override
     public void run() {
-        //todo not impl retry
         doRunnable();
     }
 
     private void doRunnable() {
+        LOG.w(TAG, "thread[" + mThreadIndex + "] isRetry: [" + (mRetryCount.get() >= 1) + "]");
         mStatus = DownloadEntry.Status.DOWNLOADING;
         HttpURLConnection connection = null;
         try {
@@ -141,53 +144,50 @@ class DownloadThread implements Runnable {
                 }
             } else {
                 mStatus = DownloadEntry.Status.ERROR;
-                mListener.onDownloadError(mThreadIndex, "server ERROR:" + responseCode);
+                mListener.onDownloadError(mThreadIndex, "error code:" + responseCode + connection.getResponseMessage());
             }
         } catch (Throwable e) {
             e.printStackTrace();
-            if (isPaused) {
-                mStatus = DownloadEntry.Status.PAUSED;
-                mListener.onDownloadPaused(mThreadIndex);
-            } else if (isCancelled) {
-                mStatus = DownloadEntry.Status.CANCELLED;
-                mListener.onDownloadCancelled(mThreadIndex);
-            } else {
-                mStatus = DownloadEntry.Status.ERROR;
-                mListener.onDownloadError(mThreadIndex, e.getMessage());
-            }
+            LOG.e(TAG, "download fail:" + e.toString());
+            isError = true;
+            mThrowable = e;
 
         } finally {
             if (connection != null) {
                 connection.disconnect();
             }
 
-            if (isError) {
-                if (mRetryCount.getAndIncrement() < mDownloadConfig.getMaxRetryCount()) {
-                    LOG.w(TAG, "RetryCount:" + mRetryCount.get());
-                    try {
-                        Thread.sleep(mDownloadConfig.getRetryIntervalMillis());
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    reset();
-                    doRunnable();
-                }
+            if (isPaused) {
+                mStatus = DownloadEntry.Status.PAUSED;
+                mListener.onDownloadPaused(mThreadIndex);
+            } else if (isCancelled) {
+                mStatus = DownloadEntry.Status.CANCELLED;
+                mListener.onDownloadCancelled(mThreadIndex);
+            } else if (isError) {
+                mStatus = DownloadEntry.Status.ERROR;
+                mListener.onDownloadError(mThreadIndex, mThrowable != null ? mThrowable.getMessage() : "error");
+                retry();
+            } else {
+                mStatus = DownloadEntry.Status.COMPLETED;
+                mListener.onDownloadCompleted(mThreadIndex);
             }
+        }
+    }
 
+    private void retry() {
+        if (!mDownloadConfig.isOpenRetry()) {
+            return;
+        }
 
-//            if (isPaused) {
-//                mStatus = DownloadEntry.Status.PAUSED;
-//                mListener.onDownloadPaused(mThreadIndex);
-//            } else if (isCancelled) {
-//                mStatus = DownloadEntry.Status.CANCELLED;
-//                mListener.onDownloadCancelled(mThreadIndex);
-//            } else if (isError) {
-//                mStatus = DownloadEntry.Status.ERROR;
-//                mListener.onDownloadError(mThreadIndex, "error");
-//            } else {
-//                mStatus = DownloadEntry.Status.COMPLETED;
-//                mListener.onDownloadCompleted(mThreadIndex);
-//            }
+        if (mRetryCount.getAndIncrement() < mDownloadConfig.getMaxRetryCount()) {
+            LOG.w(TAG, "thread[" + mThreadIndex + "] RetryCount:" + mRetryCount.get());
+            try {
+                Thread.sleep(mDownloadConfig.getRetryIntervalMillis());
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            reset();
+            doRunnable();
         }
     }
 
@@ -209,9 +209,6 @@ class DownloadThread implements Runnable {
         isCancelled = true;
     }
 
-    public void callCancelByError() {
-        isError = true;
-    }
 
     public void callCompleted() {
         isCompleted = true;

@@ -25,7 +25,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 
 /**
- * @author huangxingwei(xwdz9989 @ gmall.com)
+ * @author huangxingwei (xwdz9989@gmall.com)
  */
 @DatabaseTable(tableName = "downloadentry")
 public class DownloadEntry implements Serializable, Cloneable {

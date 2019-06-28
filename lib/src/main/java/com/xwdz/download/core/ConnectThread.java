@@ -46,6 +46,7 @@ public class ConnectThread implements Runnable {
 
     @Override
     public void run() {
+        LOG.w(TAG, "isRetry: [" + (mRetryCount.get() >= 1) + "]");
         isRunning = true;
         HttpURLConnection connection = null;
         try {

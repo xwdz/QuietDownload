@@ -91,9 +91,9 @@ public class DownloaderHandler {
             for (DownloadEntry downloadEntry : downloadEntrys) {
 
                 if (downloadEntry.status == DownloadEntry.Status.PAUSED) {
-                    // todo 暂停的自动赋值恢复进度
-                    Logger.d(TAG, "auto recover");
-//                    startDownload(downloadEntry);
+                    if (mDownloadConfig.isAutoRecovery()) {
+                        startDownload(downloadEntry);
+                    }
                 }
 
                 if (downloadEntry.status == DownloadEntry.Status.DOWNLOADING

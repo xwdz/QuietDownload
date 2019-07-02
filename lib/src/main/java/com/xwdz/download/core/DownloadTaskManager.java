@@ -76,7 +76,6 @@ public class DownloadTaskManager implements ConnectThread.ConnectListener, Downl
     }
 
     void start() {
-
         Logger.w(TAG, "entry status:" + mDownloadEntry.status);
 
         if (mDownloadEntry.status == DownloadEntry.Status.DOWNLOADING) {
@@ -224,14 +223,12 @@ public class DownloadTaskManager implements ConnectThread.ConnectListener, Downl
         Logger.e(TAG, "[" + index + "]" + "Thread" + " downloadError:" + message);
         mStatuses[index] = DownloadEntry.Status.ERROR;
 
-
 //        for (int j = 0; j < mStatuses.length; j++) {
 //            if (mStatuses[j] != DownloadEntry.Status.COMPLETED && mStatuses[j] != DownloadEntry.Status.ERROR) {
 //                mDownloadThreads[j].callCancelByError();
 //                return;
 //            }
 //        }
-
 
         mDownloadEntry.status = DownloadEntry.Status.ERROR;
         notifyUpdate(mDownloadEntry, DownloaderHandler.NOTIFY_ERROR);

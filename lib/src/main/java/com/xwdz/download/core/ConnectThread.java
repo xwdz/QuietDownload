@@ -18,7 +18,7 @@ package com.xwdz.download.core;
 
 
 import com.xwdz.download.DownloadConfig;
-import com.xwdz.download.utils.LOG;
+import com.xwdz.download.utils.Logger;
 
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -46,7 +46,7 @@ public class ConnectThread implements Runnable {
 
     @Override
     public void run() {
-        LOG.w(TAG, "isRetry: [" + (mRetryCount.get() >= 1) + "]");
+        Logger.w(TAG, "isRetry: [" + (mRetryCount.get() >= 1) + "]");
         isRunning = true;
         HttpURLConnection connection = null;
         try {
@@ -78,7 +78,7 @@ public class ConnectThread implements Runnable {
             }
             if (isError) {
                 if (mRetryCount.getAndIncrement() < mDownloadConfig.getMaxRetryCount()) {
-                    LOG.w(TAG, "RetryCount:" + mRetryCount.get());
+                    Logger.w(TAG, "RetryCount:" + mRetryCount.get());
                     try {
                         Thread.sleep(mDownloadConfig.getRetryIntervalMillis());
                     } catch (InterruptedException e) {

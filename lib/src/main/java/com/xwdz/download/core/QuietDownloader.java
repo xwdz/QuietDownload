@@ -17,18 +17,16 @@
 package com.xwdz.download.core;
 
 import android.content.Context;
-import android.content.Intent;
-import android.os.Build;
 
 import com.j256.ormlite.dao.Dao;
 import com.xwdz.download.DownloadConfig;
 import com.xwdz.download.notify.DataUpdatedWatcher;
 import com.xwdz.download.utils.Constants;
-import com.xwdz.download.utils.LOG;
+import com.xwdz.download.utils.Logger;
 
 import java.io.File;
 import java.sql.SQLException;
-import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author 黄兴伟 (xwdz9989@gamil.com)
@@ -45,17 +43,17 @@ public class QuietDownloader {
         return Holder.INSTANCE;
     }
 
+
+    private static boolean sInitialize;
+
+    //
+    private DownloadConfig    mDownloadConfig;
+    private Context           mContext;
+    private long              mLastOperatedTime = 0;
+    private DownloaderHandler mDownloadHandler;
+
     private QuietDownloader() {
-        mDataChanger = DataChanger.getImpl();
     }
-
-
-    private static boolean mInit;
-
-    private Context        mContext;
-    private long           mLastOperatedTime = 0;
-    private DataChanger    mDataChanger;
-    private DownloadConfig mDownloadConfig;
 
 
     public void initializeConfig(Context context) {
@@ -63,19 +61,12 @@ public class QuietDownloader {
     }
 
     public void initializeConfig(DownloadConfig downloadConfig) {
-        this.mDownloadConfig = downloadConfig;
-        this.mContext = downloadConfig.getContext().getApplicationContext();
-        this.mDownloadConfig = new DownloadConfig(mContext);
-        DownloadDBManager.getImpl().initDBHelper(mContext);
-    }
-
-    public void startService() {
-        mInit = true;
-        Intent intent = new Intent(mContext, DownloadService.class);
-        if (Build.VERSION.SDK_INT >= 26) {
-            mContext.startForegroundService(intent);
-        } else {
-            mContext.startService(intent);
+        if (!sInitialize) {
+            mContext = downloadConfig.getContext().getApplicationContext();
+            DownloadDBManager.getImpl().initDBHelper(mContext);
+            mDownloadConfig = downloadConfig;
+            mDownloadHandler = new DownloaderHandler(mDownloadConfig);
+            sInitialize = true;
         }
     }
 
@@ -85,11 +76,11 @@ public class QuietDownloader {
     private boolean checkIfExecutable() {
         long    tmp               = System.currentTimeMillis();
         boolean isMinTimeInterval = tmp - mLastOperatedTime > mDownloadConfig.getMinOperateInterval();
-        if (isMinTimeInterval && mInit) {
+        if (isMinTimeInterval && sInitialize) {
             mLastOperatedTime = tmp;
             return true;
         } else {
-            LOG.e(TAG, "isMinTimeInterval:" + isMinTimeInterval + " mInit:" + mInit);
+            Logger.e(TAG, "isMinTimeInterval:" + isMinTimeInterval + " sInitialize:" + sInitialize);
         }
         return false;
     }
@@ -102,10 +93,7 @@ public class QuietDownloader {
             return;
         }
 
-        Intent intent = new Intent(mContext, DownloadService.class);
-        intent.putExtra(Constants.KEY_DOWNLOAD_ENTRY, downloadEntry);
-        intent.putExtra(Constants.KEY_DOWNLOAD_ACTION, Constants.KEY_DOWNLOAD_ACTION_ADD);
-        mContext.startService(intent);
+        mDownloadHandler.handler(Constants.KEY_DOWNLOAD_ACTION_ADD, downloadEntry);
     }
 
     /**
@@ -115,10 +103,7 @@ public class QuietDownloader {
         if (!checkIfExecutable()) {
             return;
         }
-        Intent intent = new Intent(mContext, DownloadService.class);
-        intent.putExtra(Constants.KEY_DOWNLOAD_ENTRY, downloadEntry);
-        intent.putExtra(Constants.KEY_DOWNLOAD_ACTION, Constants.KEY_DOWNLOAD_ACTION_PAUSE);
-        mContext.startService(intent);
+        mDownloadHandler.handler(Constants.KEY_DOWNLOAD_ACTION_PAUSE, downloadEntry);
     }
 
     /**
@@ -129,10 +114,8 @@ public class QuietDownloader {
             return;
         }
 
-        Intent intent = new Intent(mContext, DownloadService.class);
-        intent.putExtra(Constants.KEY_DOWNLOAD_ENTRY, downloadEntry);
-        intent.putExtra(Constants.KEY_DOWNLOAD_ACTION, Constants.KEY_DOWNLOAD_ACTION_RESUME);
-        mContext.startService(intent);
+
+        mDownloadHandler.handler(Constants.KEY_DOWNLOAD_ACTION_RESUME, downloadEntry);
     }
 
     /**
@@ -142,10 +125,7 @@ public class QuietDownloader {
         if (!checkIfExecutable()) {
             return;
         }
-        Intent intent = new Intent(mContext, DownloadService.class);
-        intent.putExtra(Constants.KEY_DOWNLOAD_ENTRY, downloadEntry);
-        intent.putExtra(Constants.KEY_DOWNLOAD_ACTION, Constants.KEY_DOWNLOAD_ACTION_CANCEL);
-        mContext.startService(intent);
+        mDownloadHandler.handler(Constants.KEY_DOWNLOAD_ACTION_CANCEL, downloadEntry);
     }
 
     /**
@@ -155,9 +135,7 @@ public class QuietDownloader {
         if (!checkIfExecutable()) {
             return;
         }
-        Intent intent = new Intent(mContext, DownloadService.class);
-        intent.putExtra(Constants.KEY_DOWNLOAD_ACTION, Constants.KEY_DOWNLOAD_ACTION_PAUSE_ALL);
-        mContext.startService(intent);
+        mDownloadHandler.handler(Constants.KEY_DOWNLOAD_ACTION_PAUSE_ALL, null);
     }
 
     /**
@@ -168,9 +146,7 @@ public class QuietDownloader {
             return;
         }
 
-        Intent intent = new Intent(mContext, DownloadService.class);
-        intent.putExtra(Constants.KEY_DOWNLOAD_ACTION, Constants.KEY_DOWNLOAD_ACTION_RECOVER_ALL);
-        mContext.startService(intent);
+        mDownloadHandler.handler(Constants.KEY_DOWNLOAD_ACTION_RECOVER_ALL, null);
     }
 
     /**
@@ -179,7 +155,7 @@ public class QuietDownloader {
      * @see DataUpdatedWatcher
      */
     public void addObserver(DataUpdatedWatcher watcher) {
-        mDataChanger.addObserver(watcher);
+        mDownloadHandler.addObserver(watcher);
     }
 
     /**
@@ -188,14 +164,14 @@ public class QuietDownloader {
      * @see DataUpdatedWatcher
      */
     public void removeObserver(DataUpdatedWatcher watcher) {
-        mDataChanger.deleteObserver(watcher);
+        mDownloadHandler.deleteObserver(watcher);
     }
 
     /**
      * @return 获取操作数据库Dao对象
      */
     public Dao<DownloadEntry, String> getDBDao() throws SQLException {
-        return DownloadDBManager.getImpl().getDao();
+        return mDownloadHandler.getDao();
     }
 
 
@@ -203,7 +179,7 @@ public class QuietDownloader {
      * 删除一个任务从数据库中
      */
     public void deleteById(String id) {
-        mDataChanger.deleteById(id);
+        mDownloadHandler.deleteById(id);
     }
 
     /**
@@ -222,14 +198,14 @@ public class QuietDownloader {
      * 查询当前队列中是否有该 DownloadEntry
      */
     public DownloadEntry queryById(String id) {
-        return mDataChanger.queryById(id);
+        return mDownloadHandler.queryById(id);
     }
 
     /**
      * 从数据库中查询所有下载任务
      */
-    public ArrayList<DownloadEntry> queryAll() {
-        return mDataChanger.queryAll();
+    public List<DownloadEntry> queryAll() {
+        return mDownloadHandler.queryAll();
     }
 
 

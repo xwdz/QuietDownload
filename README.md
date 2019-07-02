@@ -49,7 +49,7 @@ implementation 'com.xwdz:QuietDownloader:$lastVersion'
 在AndroidManifest.xml 声明如下service
 
 ```
-<service android:name="com.xwdz.download.core.DownloadService"/>
+<service android:name="com.xwdz.download.core.DownloaderHandler"/>
 ```
 
 #### 配置

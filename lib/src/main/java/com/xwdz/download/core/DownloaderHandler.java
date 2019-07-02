@@ -16,22 +16,18 @@
 
 package com.xwdz.download.core;
 
-import android.app.Notification;
-import android.app.Service;
-import android.content.Intent;
-import android.os.Build;
 import android.os.Handler;
-import android.os.IBinder;
 import android.os.Message;
-import android.support.v4.app.NotificationCompat;
 
-import com.example.lib.R;
+import com.j256.ormlite.dao.Dao;
 import com.xwdz.download.DownloadConfig;
+import com.xwdz.download.notify.DataUpdatedWatcher;
 import com.xwdz.download.utils.Constants;
-import com.xwdz.download.utils.LOG;
-import com.xwdz.download.utils.NetworkUtils;
+import com.xwdz.download.utils.Logger;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingDeque;
@@ -39,9 +35,9 @@ import java.util.concurrent.LinkedBlockingDeque;
 /**
  * @author 黄兴伟 (xwdz9989@gamil.com)
  */
-public class DownloadService extends Service {
+public class DownloaderHandler {
 
-    private static final String TAG = DownloadService.class.getSimpleName();
+    private static final String TAG = DownloaderHandler.class.getSimpleName();
 
     public static final int NOTIFY_DOWNLOADING         = 1;
     public static final int NOTIFY_UPDATING            = 2;
@@ -72,7 +68,6 @@ public class DownloadService extends Service {
         }
     });
 
-
     private void checkNext(DownloadEntry obj) {
         mDownloadingTasks.remove(obj.id);
         DownloadEntry newDownloadEntry = mWaitingQueue.poll();
@@ -81,36 +76,23 @@ public class DownloadService extends Service {
         }
     }
 
+    ////////////////////////////////////////////////////
 
-    @Override
-    public IBinder onBind(Intent intent) {
-        return null;
-    }
-
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        LOG.d(TAG, "downloader service created. ");
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-//            Notification.Builder notificationBuilder = new Notification.Builder(this, "xwd_download");
-//            notificationBuilder.setOngoing(true);
-//            startForeground(101, notificationBuilder.build());
-//        }
-
+    DownloaderHandler(DownloadConfig config) {
+        Logger.d(TAG, "downloader handler created. ");
+        mDownloadConfig = config;
         mDataChanger = DataChanger.getImpl();
-        mDownloadConfig = QuietDownloader.getImpl().getConfigs();
-
         initDownload();
     }
 
     private void initDownload() {
-        ArrayList<DownloadEntry> downloadEntrys = mDataChanger.queryAll();
+        List<DownloadEntry> downloadEntrys = mDataChanger.queryAll();
         if (downloadEntrys != null) {
             for (DownloadEntry downloadEntry : downloadEntrys) {
 
                 if (downloadEntry.status == DownloadEntry.Status.PAUSED) {
                     // todo 暂停的自动赋值恢复进度
-                    LOG.d(TAG, "auto recover");
+                    Logger.d(TAG, "auto recover");
 //                    startDownload(downloadEntry);
                 }
 
@@ -140,28 +122,7 @@ public class DownloadService extends Service {
     }
 
 
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        if (intent != null) {
-            LOG.d(TAG, "onStartCommand receiver intent:" + intent);
-            DownloadEntry downloadEntry = (DownloadEntry) intent.getSerializableExtra(Constants.KEY_DOWNLOAD_ENTRY);
-            if (downloadEntry == null) {
-                LOG.w(TAG, "onStartCommand receiver downloadEntry is null");
-                return START_STICKY;
-            }
-
-            if (mDataChanger.contains(downloadEntry.id)) {
-                downloadEntry = mDataChanger.queryById(downloadEntry.id);
-            }
-            int action = intent.getIntExtra(Constants.KEY_DOWNLOAD_ACTION, -1);
-            doAction(action, downloadEntry);
-        } else {
-            LOG.d(TAG, "not receiver intent");
-        }
-        return START_STICKY;
-    }
-
-    private void doAction(int action, DownloadEntry downloadEntry) {
+    void handler(int action, DownloadEntry downloadEntry) {
         switch (action) {
             case Constants.KEY_DOWNLOAD_ACTION_ADD:
                 addDownload(downloadEntry);
@@ -184,7 +145,7 @@ public class DownloadService extends Service {
         }
     }
 
-    private void recoverAll() {
+    void recoverAll() {
         ArrayList<DownloadEntry> mRecoverableEntries = mDataChanger.queryAllRecoverableEntries();
         if (mRecoverableEntries != null) {
             for (DownloadEntry downloadEntry : mRecoverableEntries) {
@@ -193,7 +154,7 @@ public class DownloadService extends Service {
         }
     }
 
-    private void pauseAll() {
+    void pauseAll() {
         while (mWaitingQueue.iterator().hasNext()) {
             DownloadEntry downloadEntry = mWaitingQueue.poll();
             downloadEntry.status = DownloadEntry.Status.PAUSED;
@@ -207,7 +168,7 @@ public class DownloadService extends Service {
         mDownloadingTasks.clear();
     }
 
-    private void addDownload(DownloadEntry downloadEntry) {
+    void addDownload(DownloadEntry downloadEntry) {
         if (mDownloadingTasks.size() >= mDownloadConfig.getMaxDownloadTasks()) {
             mWaitingQueue.offer(downloadEntry);
             downloadEntry.status = DownloadEntry.Status.WAITING;
@@ -217,7 +178,7 @@ public class DownloadService extends Service {
         }
     }
 
-    private void cancelDownload(DownloadEntry downloadEntry) {
+    void cancelDownload(DownloadEntry downloadEntry) {
         DownloadTaskManager task = mDownloadingTasks.remove(downloadEntry.id);
         if (task != null) {
             task.cancel();
@@ -228,11 +189,11 @@ public class DownloadService extends Service {
         }
     }
 
-    private void resumeDownload(DownloadEntry downloadEntry) {
+    void resumeDownload(DownloadEntry downloadEntry) {
         addDownload(downloadEntry);
     }
 
-    private void pauseDownload(DownloadEntry downloadEntry) {
+    void pauseDownload(DownloadEntry downloadEntry) {
         DownloadTaskManager task = mDownloadingTasks.remove(downloadEntry.id);
         if (task != null) {
             task.pause();
@@ -243,10 +204,34 @@ public class DownloadService extends Service {
         }
     }
 
-    private void startDownload(DownloadEntry downloadEntry) {
+    void startDownload(DownloadEntry downloadEntry) {
         DownloadTaskManager task = new DownloadTaskManager(downloadEntry, mHandler);
         task.start();
         mDownloadingTasks.put(downloadEntry.id, task);
+    }
+
+    void deleteById(String id) {
+        mDataChanger.deleteById(id);
+    }
+
+    DownloadEntry queryById(String id) {
+        return mDataChanger.queryById(id);
+    }
+
+    List<DownloadEntry> queryAll() {
+        return mDataChanger.queryAll();
+    }
+
+    Dao<DownloadEntry, String> getDao() throws SQLException {
+        return DownloadDBManager.getImpl().getDao();
+    }
+
+    void deleteObserver(DataUpdatedWatcher watcher) {
+        mDataChanger.deleteObserver(watcher);
+    }
+
+    void addObserver(DataUpdatedWatcher watcher) {
+        mDataChanger.addObserver(watcher);
     }
 
 }

@@ -40,7 +40,6 @@ public class App extends Application {
 //        QuietDownloader.getImpl().setDownloadConfig(downloadConfig);
 
         QuietDownloader.getImpl().initializeConfig(this);
-        QuietDownloader.getImpl().startService();
 
     }
 

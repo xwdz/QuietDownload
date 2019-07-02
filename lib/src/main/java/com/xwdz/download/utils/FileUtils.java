@@ -43,7 +43,7 @@ public class FileUtils {
             digest.update(data);
             hash = digest.digest();
         } catch (NoSuchAlgorithmException e) {
-            LOG.e(TAG,e.getMessage());
+            Logger.e(TAG,e.getMessage());
         }
         return hash;
     }

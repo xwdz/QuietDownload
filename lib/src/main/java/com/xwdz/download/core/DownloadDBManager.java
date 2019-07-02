@@ -19,10 +19,11 @@ package com.xwdz.download.core;
 import android.content.Context;
 
 import com.j256.ormlite.dao.Dao;
-import com.xwdz.download.utils.LOG;
+import com.xwdz.download.utils.Logger;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author huangxingwei (xwdz9989@gamil.com)
@@ -33,7 +34,7 @@ class DownloadDBManager {
     private static final String TAG = DownloadDBManager.class.getSimpleName();
 
     private static DownloadDBManager instance;
-    private DownloadDBHelper mDBHelper;
+    private        DownloadDBHelper  mDBHelper;
 
     private DownloadDBManager() {
     }
@@ -58,13 +59,13 @@ class DownloadDBManager {
         }
     }
 
-    synchronized ArrayList<DownloadEntry> queryAll() {
+    synchronized List<DownloadEntry> queryAll() {
         Dao<DownloadEntry, String> dao;
         try {
             dao = mDBHelper.getDao(DownloadEntry.class);
-            return (ArrayList<DownloadEntry>) dao.query(dao.queryBuilder().prepare());
+            return dao.query(dao.queryBuilder().prepare());
         } catch (SQLException e) {
-            LOG.e(TAG, e.getMessage());
+            Logger.e(TAG, e.getMessage());
             return new ArrayList<>();
         }
     }
@@ -74,7 +75,7 @@ class DownloadDBManager {
             Dao<DownloadEntry, String> dao = mDBHelper.getDao(DownloadEntry.class);
             return dao.queryForId(id);
         } catch (SQLException e) {
-            LOG.e(TAG, e.getMessage());
+            Logger.e(TAG, e.getMessage());
             return null;
         }
     }

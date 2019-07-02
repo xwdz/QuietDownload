@@ -56,7 +56,7 @@ public class NetworkUtils {
 				return pwrMgr.isScreenOn();
 			}
 		} catch (Throwable t) {
-			LOG.e(TAG, "getImpl screen status failed("
+			Logger.e(TAG, "getImpl screen status failed("
 					+ t.getClass().getSimpleName() + "): " + t.getMessage());
 		}
 
@@ -75,7 +75,7 @@ public class NetworkUtils {
 			NetworkInfo info = connMgr.getActiveNetworkInfo();
 			return ((null != info) && info.isAvailable());
 		} catch (Throwable t) {
-			LOG.e(TAG, "getImpl active network info failed(Throwable): " + t.getMessage());
+			Logger.e(TAG, "getImpl active network info failed(Throwable): " + t.getMessage());
 		}
 
 		return false;
@@ -94,7 +94,7 @@ public class NetworkUtils {
 			return ((null != info) && info.isAvailable()
 					&& (info.getType() == ConnectivityManager.TYPE_WIFI));
 		} catch (Throwable t) {
-			LOG.e(TAG, "check WIFI available failed(Throwable): " + t.getMessage());
+			Logger.e(TAG, "check WIFI available failed(Throwable): " + t.getMessage());
 		}
 
 		return false;
@@ -113,7 +113,7 @@ public class NetworkUtils {
 			return ((null != info) && info.isAvailable()
 					&& (info.getType() == ConnectivityManager.TYPE_MOBILE));
 		} catch (Throwable t) {
-			LOG.e(TAG, "check mobile available failed(Throwable): " + t.getMessage());
+			Logger.e(TAG, "check mobile available failed(Throwable): " + t.getMessage());
 		}
 
 		return false;
@@ -146,7 +146,7 @@ public class NetworkUtils {
 				}
 			}
 		} catch (Throwable t) {
-			LOG.e(TAG, "getImpl network type failed(" + t.getClass().getSimpleName()
+			Logger.e(TAG, "getImpl network type failed(" + t.getClass().getSimpleName()
 					+ "): " + t.getMessage());
 		}
 

@@ -17,7 +17,7 @@
 package com.xwdz.download.core;
 
 import com.xwdz.download.DownloadConfig;
-import com.xwdz.download.utils.LOG;
+import com.xwdz.download.utils.Logger;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -26,7 +26,6 @@ import java.io.RandomAccessFile;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.logging.Logger;
 
 /**
  * @author 黄兴伟 (xwdz9989@gamil.com)
@@ -75,7 +74,7 @@ class DownloadThread implements Runnable {
     }
 
     private void doRunnable() {
-        LOG.w(TAG, "thread[" + mThreadIndex + "] isRetry: [" + (mRetryCount.get() >= 1) + "]");
+        Logger.w(TAG, "thread[" + mThreadIndex + "] isRetry: [" + (mRetryCount.get() >= 1) + "]");
         mStatus = DownloadEntry.Status.DOWNLOADING;
         HttpURLConnection connection = null;
         try {
@@ -148,7 +147,7 @@ class DownloadThread implements Runnable {
             }
         } catch (Throwable e) {
             e.printStackTrace();
-            LOG.e(TAG, "download fail:" + e.toString());
+            Logger.e(TAG, "download fail:" + e.toString());
             isError = true;
             mThrowable = e;
 
@@ -180,7 +179,7 @@ class DownloadThread implements Runnable {
         }
 
         if (mRetryCount.getAndIncrement() < mDownloadConfig.getMaxRetryCount()) {
-            LOG.w(TAG, "thread[" + mThreadIndex + "] RetryCount:" + mRetryCount.get());
+            Logger.w(TAG, "thread[" + mThreadIndex + "] RetryCount:" + mRetryCount.get());
             try {
                 Thread.sleep(mDownloadConfig.getRetryIntervalMillis());
             } catch (InterruptedException e) {

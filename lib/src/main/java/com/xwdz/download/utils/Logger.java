@@ -23,10 +23,10 @@ import com.xwdz.download.core.QuietDownloader;
 /**
  * @author xwdz(xwdz9989 @ gmail.com)
  */
-public class LOG {
+public class Logger {
 
-    public static final String TAG = "xwdz_downloader";
-    private static final boolean DEBUG = QuietDownloader.getImpl().getConfigs().isDebug;
+    private static final String  TAG   = "xwdz_downloader";
+    public static final boolean DEBUG = true;
 
     public static void d(String msg) {
         if (DEBUG)

@@ -20,6 +20,7 @@ import android.content.Context;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Observable;
 
@@ -103,7 +104,7 @@ class DataChanger extends Observable {
         DownloadDBManager.getImpl().deleteById(id);
     }
 
-    ArrayList<DownloadEntry> queryAll() {
+    List<DownloadEntry> queryAll() {
         if (mOperatedEntries == null || mOperatedEntries.isEmpty()) {
             return DownloadDBManager.getImpl().queryAll();
         }
@@ -113,7 +114,6 @@ class DataChanger extends Observable {
 
     void newOrUpdate(DownloadEntry downloadEntry) {
         DownloadDBManager.getImpl().newOrUpdate(downloadEntry);
-
     }
 
 

@@ -18,6 +18,7 @@ package com.xwdz.download.utils;
 
 import android.util.Log;
 
+import com.xwdz.download.DownloadConfig;
 import com.xwdz.download.core.QuietDownloader;
 
 /**
@@ -25,27 +26,26 @@ import com.xwdz.download.core.QuietDownloader;
  */
 public class Logger {
 
-    private static final String  TAG   = "xwdz_downloader";
-    public static final boolean DEBUG = true;
+    private static final String TAG = "xwdz_downloader";
 
     public static void d(String msg) {
-        if (DEBUG)
+        if (DownloadConfig.isDebug)
             Log.d(TAG, msg);
     }
 
     public static void d(String tag, String msg) {
-        if (DEBUG)
+        if (DownloadConfig.isDebug)
             Log.d(TAG, "[" + tag + "] " + msg);
     }
 
 
     public static void e(String tag, String msg) {
-        if (DEBUG)
+        if (DownloadConfig.isDebug)
             Log.e(TAG, "[" + tag + "] " + msg);
     }
 
     public static void w(String tag, String msg) {
-        if (DEBUG)
+        if (DownloadConfig.isDebug)
             Log.w(TAG, "[" + tag + "] " + msg);
     }
 }

@@ -26,7 +26,7 @@ import java.io.File;
  */
 public class DownloadConfig {
 
-    public boolean isDebug = true;
+    public static boolean isDebug = true;
 
     /**
      * 最大同时下载任务数
@@ -48,14 +48,25 @@ public class DownloadConfig {
      * 自动恢复下载
      **/
     private boolean mRecoverDownloadWhenStart = true;
+    /**
+     * 是否自动回复下载
+     */
+    private boolean mAutoRecovery             = false;
+    /**
+     * 是否打开重试
+     */
+    private boolean mOpenRetry                = false;
 
-    private boolean mOpenRetry = false;
+    /**
+     * 重试次数
+     */
+    private int  mMaxRetryCount       = 3;
+    /**
+     * 每次重试时间间隔
+     */
+    private long mRetryIntervalMillis = 2500;
 
     private long mMaxFileLength = 50 * 1024 * 1024;
-
-    private int mMaxRetryCount = 3;
-
-    private long mRetryIntervalMillis = 2500;
 
     private Context mContext;
 
@@ -67,6 +78,15 @@ public class DownloadConfig {
 
     public int getMaxDownloadTasks() {
         return mMaxDownloadTasks;
+    }
+
+
+    public boolean isAutoRecovery() {
+        return mAutoRecovery;
+    }
+
+    public void setAutoRecovery(boolean autoRecovery) {
+        mAutoRecovery = autoRecovery;
     }
 
     public DownloadConfig setMaxDownloadTasks(int maxDownloadTasks) {
@@ -123,8 +143,8 @@ public class DownloadConfig {
         return this;
     }
 
-    public Context getContext() {
-        return mContext;
+    public Context getAppContext() {
+        return mContext.getApplicationContext();
     }
 
     public void setContext(Context context) {

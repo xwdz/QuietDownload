@@ -43,27 +43,28 @@ public class QuietDownloader {
         return Holder.INSTANCE;
     }
 
+    public static void initializeDownloader(Context context) {
+        getImpl().initialize(new DownloadConfig(context));
+    }
+
+    public static void initializeDownloader(DownloadConfig downloadConfig) {
+        getImpl().initialize(downloadConfig);
+    }
+
 
     private static boolean sInitialize;
 
     //
     private DownloadConfig    mDownloadConfig;
-    private Context           mContext;
     private long              mLastOperatedTime = 0;
     private DownloaderHandler mDownloadHandler;
 
     private QuietDownloader() {
     }
 
-
-    public void initializeConfig(Context context) {
-        initializeConfig(new DownloadConfig(context));
-    }
-
-    public void initializeConfig(DownloadConfig downloadConfig) {
+    private void initialize(DownloadConfig downloadConfig) {
         if (!sInitialize) {
-            mContext = downloadConfig.getContext().getApplicationContext();
-            DownloadDBManager.getImpl().initDBHelper(mContext);
+            DownloadDBManager.getImpl().initDBHelper(downloadConfig.getAppContext());
             mDownloadConfig = downloadConfig;
             mDownloadHandler = new DownloaderHandler(mDownloadConfig);
             sInitialize = true;

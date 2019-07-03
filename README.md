@@ -63,7 +63,7 @@ implementation 'com.xwdz:QuietDownloader:$lastVersion'
        QuietDownloader.initializeDownloader(downloadConfig);
    
      
-#### DownloadEntry的几种状态
+#### DownloadEntry.Status的几种状态
 
 |状态|说明|
 |:---|:---|

@@ -19,7 +19,10 @@ package com.xwdz.download;
 import android.content.Context;
 import android.os.Environment;
 
+import com.xwdz.download.utils.Logger;
+
 import java.io.File;
+import java.io.IOException;
 
 /**
  * @author 黄兴伟 (xwdz9989@gamil.com)
@@ -31,40 +34,36 @@ public class DownloadConfig {
     /**
      * 最大同时下载任务数
      **/
-    private int     mMaxDownloadTasks         = 3;
+    private int     mMaxDownloadTasks   = 3;
     /**
      * 最大下载线程数
      **/
-    private int     mMaxDownloadThreads       = 3;
+    private int     mMaxDownloadThreads = 3;
     /**
      * 下载文件夹
      **/
-    private File    mDownloadDir              = null;
+    private File    mDownloadDir        = null;
     /**
      * 事件间隔
      **/
-    private int     mMinOperateInterval       = 800;
-    /**
-     * 自动恢复下载
-     **/
-    private boolean mRecoverDownloadWhenStart = true;
+    private int     mMinOperateInterval = 800;
     /**
      * 是否自动回复下载
      */
-    private boolean mAutoRecovery             = false;
+    private boolean mAutoRecovery       = false;
     /**
      * 是否打开重试
      */
-    private boolean mOpenRetry                = false;
+    private boolean mOpenRetry          = false;
 
     /**
      * 重试次数
      */
-    private int  mMaxRetryCount       = 3;
+    private int     mMaxRetryCount       = 3;
     /**
      * 每次重试时间间隔
      */
-    private long mRetryIntervalMillis = 2500;
+    private long    mRetryIntervalMillis = 2500;
     /**
      * 是否开启指定网络
      */
@@ -155,15 +154,6 @@ public class DownloadConfig {
         mContext = context;
     }
 
-    public boolean isRecoverDownloadWhenStart() {
-        return mRecoverDownloadWhenStart;
-    }
-
-    public DownloadConfig setRecoverDownloadWhenStart(boolean recoverDownloadWhenStart) {
-        this.mRecoverDownloadWhenStart = recoverDownloadWhenStart;
-        return this;
-    }
-
     public int getMaxRetryCount() {
         return mMaxRetryCount;
     }
@@ -182,7 +172,16 @@ public class DownloadConfig {
     }
 
     public File getDownloadFile(String name) {
-        return new File(mDownloadDir, name);
+        final File file = new File(mDownloadDir, name);
+        if (!file.exists()) {
+            try {
+                boolean result = file.createNewFile();
+                Logger.w("DownloadConfig", "get Download file result:" + result + " name:" + name);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return file;
     }
 
     private int mConnTimeMillis    = 30 * 1000;

@@ -91,15 +91,9 @@ public class DownloaderHandler {
         if (downloadEntrys != null) {
             for (DownloadEntry downloadEntry : downloadEntrys) {
 
-                if (downloadEntry.status == DownloadEntry.Status.PAUSED) {
-                    if (mDownloadConfig.isAutoRecovery()) {
-                        startDownload(downloadEntry);
-                    }
-                }
-
                 if (downloadEntry.status == DownloadEntry.Status.DOWNLOADING
                         || downloadEntry.status == DownloadEntry.Status.WAITING) {
-                    if (mDownloadConfig.isRecoverDownloadWhenStart()) {
+                    if (mDownloadConfig.isAutoRecovery()) {
                         if (downloadEntry.isSupportRange) {
                             downloadEntry.status = DownloadEntry.Status.PAUSED;
                         } else {

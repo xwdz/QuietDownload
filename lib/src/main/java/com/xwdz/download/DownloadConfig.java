@@ -65,6 +65,10 @@ public class DownloadConfig {
      * 每次重试时间间隔
      */
     private long mRetryIntervalMillis = 2500;
+    /**
+     * 是否开启指定网络
+     */
+    private boolean isAssignNetworl;
 
     private long mMaxFileLength = 50 * 1024 * 1024;
 
@@ -219,5 +223,13 @@ public class DownloadConfig {
             cachePath = context.getCacheDir().getPath();
         }
         return new File(cachePath + File.separator + uniqueName);
+    }
+
+    public boolean isAssignNetwork() {
+        return isAssignNetworl;
+    }
+
+    public void setAssignNetwork(boolean assignNetwork) {
+        isAssignNetworl = assignNetwork;
     }
 }

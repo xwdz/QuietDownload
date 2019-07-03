@@ -35,7 +35,6 @@ public class App extends Application {
 
         DownloadConfig downloadConfig = new DownloadConfig(this);
         downloadConfig.setMaxDownloadTasks(5);
-        downloadConfig.setMaxDownloadThreads(4);
         downloadConfig.setAutoRecovery(true);
 
         QuietDownloader.initializeDownloader(downloadConfig);

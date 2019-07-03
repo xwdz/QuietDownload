@@ -24,6 +24,7 @@ import com.xwdz.download.DownloadConfig;
 import com.xwdz.download.notify.DataUpdatedWatcher;
 import com.xwdz.download.utils.Constants;
 import com.xwdz.download.utils.Logger;
+import com.xwdz.download.utils.NetworkUtils;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -49,7 +50,7 @@ public class DownloaderHandler {
 
     private ConcurrentHashMap<String, DownloadTaskManager> mDownloadingTasks = new ConcurrentHashMap<>();
     private LinkedBlockingDeque<DownloadEntry>             mWaitingQueue     = new LinkedBlockingDeque<>();
-    private LinkedBlockingDeque<DownloadEntry>             mWifiQueue        = new LinkedBlockingDeque<>();
+    private LinkedBlockingDeque<DownloadEntry>             mWaitWifiQueue    = new LinkedBlockingDeque<>();
     private DataChanger                                    mDataChanger;
     private DownloadConfig                                 mDownloadConfig;
 
@@ -205,9 +206,16 @@ public class DownloaderHandler {
     }
 
     void startDownload(DownloadEntry downloadEntry) {
-        DownloadTaskManager task = new DownloadTaskManager(downloadEntry, mHandler);
-        task.start();
-        mDownloadingTasks.put(downloadEntry.id, task);
+        if (mDownloadConfig.isAssignNetwork()) {
+            if (!NetworkUtils.isWIFIAvailable(mDownloadConfig.getAppContext())) {
+                Logger.d(TAG,"current network not wifi! add to Wifi Queue");
+                mWaitWifiQueue.offer(downloadEntry);
+            }
+        } else {
+            DownloadTaskManager task = new DownloadTaskManager(downloadEntry, mHandler);
+            task.start();
+            mDownloadingTasks.put(downloadEntry.id, task);
+        }
     }
 
     void deleteById(String id) {

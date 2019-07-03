@@ -46,11 +46,6 @@ implementation 'com.j256.ormlite:ormlite-android:4.48'
 implementation 'com.xwdz:QuietDownloader:$lastVersion'
 ```
 
-在AndroidManifest.xml 声明如下service
-
-```
-<service android:name="com.xwdz.download.core.DownloaderHandler"/>
-```
 
 #### 配置
 
@@ -65,9 +60,7 @@ implementation 'com.xwdz:QuietDownloader:$lastVersion'
         // downloadConfig.setDownloadDir() 下载文件路径
             ...省略若干
         
-        QuietDownloader.get().setDownloadConfig(downloadConfig);
-        QuietDownloader.get().setContext(this);
-        QuietDownloader.get().startService(); 
+       QuietDownloader.initializeDownloader(downloadConfig);
    
      
 #### DownloadEntry的几种状态
@@ -199,16 +192,21 @@ public class DownloadEntry implements Serializable {
 
 
 ### TODO
- - 重试机制
- - 拦截器实现
- 
+ - [x] 重试机制
+ - [ ] 拦截器实现
 
  
 ---
 
 ## 版本历史
 
-### v1.0.6beta
+
+### v1.0.61-beta
+  - 不再需要声明组件Service
+  - 初始化直接可使用静态方法`QuietDownloader.initializeDownloader(downloadConfig);
+  - 增加自动重试机制
+
+### v1.0.6-beta
   - 内部增加检查当前`DownloadEntry.status`机制，如果正在下载则忽略事件
   - HTTP增加`Connect Header`
 

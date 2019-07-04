@@ -92,7 +92,7 @@ private final DownloadEntry downloadEntry = new DownloadEntry("url","name");
 
 |`mDownloader` 常用Api|参数|说明|
 |:---|:---|:---|
-|`startDownload`|downloadEntry|下载一个任务|
+|`download`|downloadEntry|下载一个任务|
 |`pause`|downloadEntry|在听一个任务|
 |`cancel`|downloadEntry|取消一个任务|
 |`resume`|downloadEntry|恢复一个下载任务|

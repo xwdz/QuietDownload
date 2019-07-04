@@ -97,7 +97,7 @@ public class DownloadTaskManager implements ConnectThread.ConnectListener, Downl
     }
 
     private void startDownload() {
-        Logger.w(TAG, "startDownload: isSupportRange-" + mDownloadEntry.isSupportRange);
+        Logger.w(TAG, "download: isSupportRange-" + mDownloadEntry.isSupportRange);
         if (mDownloadEntry.isSupportRange) {
             startMultiDownload();
         } else {

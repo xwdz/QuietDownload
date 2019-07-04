@@ -137,7 +137,7 @@ public class ListActivity extends AppCompatActivity {
                             || entry.status == DownloadEntry.Status.CANCELLED
                             || entry.status == DownloadEntry.Status.PAUSED
                             || entry.status == DownloadEntry.Status.ERROR) {
-                        mQuietDownloader.startDownload(entry);
+                        mQuietDownloader.download(entry);
                     }
                 }
             });

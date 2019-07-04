@@ -89,7 +89,7 @@ public class QuietDownloader {
     /**
      * 开始下载一个任务
      */
-    public void startDownload(DownloadEntry downloadEntry) {
+    public void download(DownloadEntry downloadEntry) {
         if (!checkIfExecutable()) {
             return;
         }

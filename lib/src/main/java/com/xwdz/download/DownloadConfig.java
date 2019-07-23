@@ -75,7 +75,7 @@ public class DownloadConfig {
 
     public DownloadConfig(Context context) {
         mContext = context;
-        mDownloadDir = getCacheDir(context, "quietDownloader");
+        mDownloadDir = getDownloadDir(context, "quietDownloader");
         checkDownloadFileExists(mDownloadDir);
     }
 
@@ -213,7 +213,7 @@ public class DownloadConfig {
         mRetryIntervalMillis = retryIntervalMillis;
     }
 
-    private File getCacheDir(Context context, String uniqueName) {
+    private File getDownloadDir(Context context, String uniqueName) {
         String cachePath;
         if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())
                 || !Environment.isExternalStorageRemovable()) {

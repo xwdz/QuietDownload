@@ -40,7 +40,6 @@ import java.util.ArrayList;
  */
 public class ListActivity extends AppCompatActivity {
 
-    private QuietDownloader mQuietDownloader;
     private ArrayList<DownloadEntry> mDownloadEntries = new ArrayList<>();
     private DataUpdatedWatcher watcher = new DataUpdatedWatcher() {
         @Override
@@ -59,7 +58,6 @@ public class ListActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mQuietDownloader = QuietDownloader.getImpl();
         setContentView(R.layout.activity_list);
 
         mDownloadEntries.add(new DownloadEntry("https://dldir1.qq.com/weixin/android/weixin673android1360.apk", "微信Apk.apk"));
@@ -81,13 +79,13 @@ public class ListActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        mQuietDownloader.addObserver(watcher);
+        QuietDownloader.addObserver(watcher);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        mQuietDownloader.removeObserver(watcher);
+        QuietDownloader.removeObserver(watcher);
     }
 
     class DownloadAdapter extends BaseAdapter {
@@ -137,7 +135,7 @@ public class ListActivity extends AppCompatActivity {
                             || entry.status == DownloadEntry.Status.CANCELLED
                             || entry.status == DownloadEntry.Status.PAUSED
                             || entry.status == DownloadEntry.Status.ERROR) {
-                        mQuietDownloader.download(entry);
+                        QuietDownloader.download(entry);
                     }
                 }
             });
@@ -146,7 +144,7 @@ public class ListActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View v) {
                     if (entry.status == DownloadEntry.Status.DOWNLOADING) {
-                        mQuietDownloader.pause(entry);
+                        QuietDownloader.pause(entry);
                     }
                 }
             });

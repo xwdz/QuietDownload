@@ -37,6 +37,9 @@ public class App extends Application {
         downloadConfig.setMaxDownloadTasks(1);
         QuietDownloader.initializeDownloader(downloadConfig);
 
+
+
+
     }
 
 }

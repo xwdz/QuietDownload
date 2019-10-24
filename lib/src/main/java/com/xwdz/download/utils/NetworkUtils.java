@@ -25,9 +25,7 @@ import android.os.PowerManager;
 import android.telephony.TelephonyManager;
 
 public class NetworkUtils {
-    /**
-     * 日志标签
-     */
+
     private final static String TAG = "NetworkUtils";
 
     /**
@@ -40,50 +38,6 @@ public class NetworkUtils {
     public static final int NET_3G      = 3;
     public static final int NET_4G      = 4;
     public static final int NET_MOBILE  = 5;
-
-
-    /**
-     * 判断当前是否亮屏
-     *
-     * @param context 上下文
-     * @return true 亮屏；false 未亮屏
-     */
-    public static boolean isScreenOn(Context context) {
-        try {
-            PowerManager pwrMgr = (PowerManager) context.getSystemService(
-                    Context.POWER_SERVICE);
-
-            if (Build.VERSION.SDK_INT >= 20) {
-                return pwrMgr.isInteractive();
-            } else {
-                return pwrMgr.isScreenOn();
-            }
-        } catch (Throwable t) {
-            Logger.e(TAG, "getImpl screen status failed("
-                    + t.getClass().getSimpleName() + "): " + t.getMessage());
-        }
-
-        return true;
-    }
-
-    /**
-     * 判断网络连接是否可用
-     *
-     * @param context 上下文环境
-     * @return true 可用；false 不可用
-     */
-    public static boolean isNetworkAvailable(Context context) {
-        try {
-            ConnectivityManager connMgr = (ConnectivityManager) context.getSystemService(
-                    Context.CONNECTIVITY_SERVICE);
-            NetworkInfo info = connMgr.getActiveNetworkInfo();
-            return ((null != info) && info.isAvailable());
-        } catch (Throwable t) {
-            Logger.e(TAG, "getImpl active network info failed(Throwable): " + t.getMessage());
-        }
-
-        return false;
-    }
 
     /**
      * 判断WIFI是否连接
@@ -208,32 +162,6 @@ public class NetworkUtils {
                 return NET_4G;
             default:
                 return NET_UNKNOWN;
-        }
-    }
-
-
-    /**
-     * 读取网络描述信息
-     *
-     * @param context 上下文环境
-     * @return 网络描述信息
-     */
-    public static String getNetworkDescriptor(Context context) {
-        try {
-            ConnectivityManager connMgr = (ConnectivityManager) context.getSystemService(
-                    Context.CONNECTIVITY_SERVICE);
-            @SuppressLint("MissingPermission") NetworkInfo info = connMgr.getActiveNetworkInfo();
-
-            if (null != info) {
-                return ("type=" + info.getType() + "/" + info.getTypeName()
-                        + "; subtype=" + info.getSubtype() + "/" + info.getSubtypeName()
-                        + "; ext=" + info.getExtraInfo() + "; conn=" + info.isConnected()
-                        + "; available=" + info.isAvailable());
-            } else {
-                return "unknown";
-            }
-        } catch (Throwable t) {
-            return t.getMessage();
         }
     }
 }

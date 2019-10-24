@@ -21,10 +21,7 @@ import android.content.Context;
 import com.j256.ormlite.dao.Dao;
 import com.xwdz.download.DownloadConfig;
 import com.xwdz.download.notify.DataUpdatedWatcher;
-import com.xwdz.download.utils.Constants;
-import com.xwdz.download.utils.Logger;
 
-import java.io.File;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -35,119 +32,57 @@ public class QuietDownloader {
 
     private static final String TAG = QuietDownloader.class.getSimpleName();
 
-    private static class Holder {
-        private static final QuietDownloader INSTANCE = new QuietDownloader();
-    }
-
-    public static QuietDownloader getImpl() {
-        return Holder.INSTANCE;
-    }
 
     public static void initializeDownloader(Context context) {
-        getImpl().initialize(new DownloadConfig(context));
+        _Loader.getImpl().initialize(new DownloadConfig(context));
     }
 
     public static void initializeDownloader(DownloadConfig downloadConfig) {
-        getImpl().initialize(downloadConfig);
+        _Loader.getImpl().initialize(downloadConfig);
     }
 
-
-    private static boolean sInitialize;
-
-    //
-    private DownloadConfig    mDownloadConfig;
-    private long              mLastOperatedTime = 0;
-    private DownloaderHandler mDownloadHandler;
-
-    private QuietDownloader() {
-    }
-
-    private void initialize(DownloadConfig downloadConfig) {
-        if (!sInitialize) {
-            DownloadDBManager.getImpl().initDBHelper(downloadConfig.getAppContext());
-            mDownloadConfig = downloadConfig;
-            mDownloadHandler = new DownloaderHandler(mDownloadConfig);
-            sInitialize = true;
-        }
-    }
-
-    /**
-     * @return 检查事件间隔时间
-     */
-    private boolean checkIfExecutable() {
-        long    tmp               = System.currentTimeMillis();
-        boolean isMinTimeInterval = tmp - mLastOperatedTime > mDownloadConfig.getMinOperateInterval();
-        if (isMinTimeInterval && sInitialize) {
-            mLastOperatedTime = tmp;
-            return true;
-        } else {
-            Logger.e(TAG, "isMinTimeInterval:" + isMinTimeInterval + " sInitialize:" + sInitialize);
-        }
-        return false;
-    }
 
     /**
      * 开始下载一个任务
      */
-    public void download(DownloadEntry downloadEntry) {
-        if (!checkIfExecutable()) {
-            return;
-        }
-
-        mDownloadHandler.handler(Constants.KEY_DOWNLOAD_ACTION_ADD, downloadEntry);
+    public static void download(DownloadEntry downloadEntry) {
+        _Loader.getImpl().download(downloadEntry);
     }
 
     /**
      * 暂停一个任务
      */
-    public void pause(DownloadEntry downloadEntry) {
-        if (!checkIfExecutable()) {
-            return;
-        }
-        mDownloadHandler.handler(Constants.KEY_DOWNLOAD_ACTION_PAUSE, downloadEntry);
+    public static void pause(DownloadEntry downloadEntry) {
+        _Loader.getImpl().pause(downloadEntry);
     }
 
     /**
      * 恢复一个任务
      */
-    public void resume(DownloadEntry downloadEntry) {
-        if (!checkIfExecutable()) {
-            return;
-        }
-
-
-        mDownloadHandler.handler(Constants.KEY_DOWNLOAD_ACTION_RESUME, downloadEntry);
+    public static void resume(DownloadEntry downloadEntry) {
+        _Loader.getImpl().resume(downloadEntry);
     }
 
     /**
      * 取消一个任务
      */
-    public void cancel(DownloadEntry downloadEntry) {
-        if (!checkIfExecutable()) {
-            return;
-        }
-        mDownloadHandler.handler(Constants.KEY_DOWNLOAD_ACTION_CANCEL, downloadEntry);
+    public static void cancel(DownloadEntry downloadEntry) {
+        _Loader.getImpl().cancel(downloadEntry);
     }
 
     /**
      * 暂停队列所有任务
      */
-    public void pauseAll() {
-        if (!checkIfExecutable()) {
-            return;
-        }
-        mDownloadHandler.handler(Constants.KEY_DOWNLOAD_ACTION_PAUSE_ALL, null);
+    public static void pauseAll() {
+        _Loader.getImpl().pauseAll();
     }
 
     /**
      * 恢复队列所有任务
      */
-    public void recoverAll() {
-        if (!checkIfExecutable()) {
-            return;
-        }
+    public static void recoverAll() {
+        _Loader.getImpl().recoverAll();
 
-        mDownloadHandler.handler(Constants.KEY_DOWNLOAD_ACTION_RECOVER_ALL, null);
     }
 
     /**
@@ -155,8 +90,8 @@ public class QuietDownloader {
      *
      * @see DataUpdatedWatcher
      */
-    public void addObserver(DataUpdatedWatcher watcher) {
-        mDownloadHandler.addObserver(watcher);
+    public static void addObserver(DataUpdatedWatcher watcher) {
+        _Loader.getImpl().addObserver(watcher);
     }
 
     /**
@@ -164,23 +99,23 @@ public class QuietDownloader {
      *
      * @see DataUpdatedWatcher
      */
-    public void removeObserver(DataUpdatedWatcher watcher) {
-        mDownloadHandler.deleteObserver(watcher);
+    public static void removeObserver(DataUpdatedWatcher watcher) {
+        _Loader.getImpl().removeObserver(watcher);
     }
 
     /**
      * @return 获取操作数据库Dao对象
      */
-    public Dao<DownloadEntry, String> getDBDao() throws SQLException {
-        return mDownloadHandler.getDao();
+    public static Dao<DownloadEntry, String> getDBDao() throws SQLException {
+        return _Loader.getImpl().getDBDao();
     }
 
 
     /**
      * 删除一个任务从数据库中
      */
-    public void deleteById(String id) {
-        mDownloadHandler.deleteById(id);
+    public static void deleteById(String id) {
+        _Loader.getImpl().deleteById(id);
     }
 
     /**
@@ -188,29 +123,27 @@ public class QuietDownloader {
      *
      * @param name 文件名
      */
-    public void deleteFileByName(String name) {
-        File file = mDownloadConfig.getDownloadFile(name);
-        if (file.exists())
-            file.delete();
+    public static void deleteFileByName(String name) {
+        _Loader.getImpl().deleteFileByName(name);
     }
 
 
     /**
      * 查询当前队列中是否有该 DownloadEntry
      */
-    public DownloadEntry queryById(String id) {
-        return mDownloadHandler.queryById(id);
+    public static DownloadEntry queryById(String id) {
+        return _Loader.getImpl().queryById(id);
     }
 
     /**
      * 从数据库中查询所有下载任务
      */
-    public List<DownloadEntry> queryAll() {
-        return mDownloadHandler.queryAll();
+    public static List<DownloadEntry> queryAll() {
+        return _Loader.getImpl().queryAll();
     }
 
 
-    public DownloadConfig getConfigs() {
-        return mDownloadConfig;
+    public static DownloadConfig getConfigs() {
+        return _Loader.getImpl().getConfigs();
     }
 }

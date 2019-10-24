@@ -30,7 +30,6 @@ import com.xwdz.download.notify.DataUpdatedWatcher;
 
 public class AppDetailActivity extends AppCompatActivity {
 
-    private QuietDownloader mDownloadManager;
     private DownloadEntry entry;
     private AppEntry mAppEntry;
     private TextView mTextView;
@@ -60,8 +59,7 @@ public class AppDetailActivity extends AppCompatActivity {
 
 
         mAppEntry = (AppEntry) getIntent().getSerializableExtra("url");
-        mDownloadManager = QuietDownloader.getImpl();
-        entry = mDownloadManager.queryById(mAppEntry.url) == null ? mAppEntry.generateDownloadEntry() : mDownloadManager.queryById(mAppEntry.url);
+        entry = QuietDownloader.queryById(mAppEntry.url) == null ? mAppEntry.generateDownloadEntry() : QuietDownloader.queryById(mAppEntry.url);
 
         initializeData();
     }
@@ -81,14 +79,14 @@ public class AppDetailActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        mDownloadManager.addObserver(watcher);
+        QuietDownloader.addObserver(watcher);
 
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        mDownloadManager.removeObserver(watcher);
+        QuietDownloader.removeObserver(watcher);
     }
 
 

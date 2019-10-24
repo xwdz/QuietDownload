@@ -33,17 +33,18 @@ class DownloadDBManager {
 
     private static final String TAG = DownloadDBManager.class.getSimpleName();
 
-    private static DownloadDBManager instance;
-    private        DownloadDBHelper  mDBHelper;
+    private static DownloadDBManager mInstance;
+
+    private DownloadDBHelper mDBHelper;
 
     private DownloadDBManager() {
     }
 
     public static DownloadDBManager getImpl() {
-        if (instance == null) {
-            instance = new DownloadDBManager();
+        if (mInstance == null) {
+            mInstance = new DownloadDBManager();
         }
-        return instance;
+        return mInstance;
     }
 
     public void initDBHelper(Context context) {

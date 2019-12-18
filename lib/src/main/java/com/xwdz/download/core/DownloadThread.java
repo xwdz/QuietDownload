@@ -65,15 +65,17 @@ class DownloadThread implements Runnable {
         this.mDestFile = destFile;
         this.mListener = listener;
         this.isSingleDownload = startPos == 0 && endPos == 0;
-        this.mDownloadConfig = QuietDownloader.getImpl().getConfigs();
+        this.mDownloadConfig = QuietDownloader.getConfigs();
+
+
     }
 
     @Override
     public void run() {
-        doRunnable();
+        _run();
     }
 
-    private void doRunnable() {
+    private void _run() {
         Logger.w(TAG, "thread[" + mThreadIndex + "] isRetry: [" + (mRetryCount.get() >= 1) + "]");
         mStatus = DownloadEntry.Status.DOWNLOADING;
         HttpURLConnection connection = null;
@@ -186,7 +188,7 @@ class DownloadThread implements Runnable {
                 e.printStackTrace();
             }
             reset();
-            doRunnable();
+            _run();
         }
     }
 

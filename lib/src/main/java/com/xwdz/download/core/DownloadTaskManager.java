@@ -45,7 +45,7 @@ public class DownloadTaskManager implements ConnectThread.ConnectListener, Downl
     private final static ExecutorService        sThreadPoolExecutor = QuietThreadPoolExecutor.getThreadPool();
 
     DownloadTaskManager(DownloadEntry downloadEntry, Handler handler) {
-        this.mDownloadConfig = QuietDownloader.getImpl().getConfigs();
+        this.mDownloadConfig = QuietDownloader.getConfigs();
         this.mDownloadEntry = downloadEntry;
         this.mHandler = handler;
         this.mDestFile = mDownloadConfig.getDownloadFile(downloadEntry.name);

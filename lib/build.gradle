@@ -45,7 +45,7 @@ publish {
     repoName = 'widget'
     groupId = 'com.xwdz'
     artifactId = 'QuietDownloader'
-    publishVersion = '1.0.7'
+    publishVersion = '1.0.8-beta'
     desc = '下载器'
     website = siteUrl
 }

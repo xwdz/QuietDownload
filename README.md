@@ -81,16 +81,16 @@ implementation 'com.xwdz:QuietDownloader:$lastVersion'
 #### 使用方法
 
 ```
-private QuietDownload mDownloader = QuietDownload.getImpl();
 
 private final DownloadEntry downloadEntry = new DownloadEntry("url","name");
 
+QuietDownloader.download(downloadEntry)
   ... 省略代码
   
 ```
 
 
-|`mDownloader` 常用Api|参数|说明|
+|常用静态方法|参数|说明|
 |:---|:---|:---|
 |`download`|downloadEntry|下载一个任务|
 |`pause`|downloadEntry|在听一个任务|
@@ -110,7 +110,7 @@ private final DownloadEntry downloadEntry = new DownloadEntry("url","name");
      
 #### 监听
 
-`QuiteDownload` 并没有采用传统listener方式，而是使用了观察者模式,如需要在某个界面监听下载进度
+`QuietDownloader` 并没有采用传统listener方式，而是使用了观察者模式,如需要在某个界面监听下载进度
 
 ```
     private final DataUpdatedWatcher mDataUpdateReceiver = new DataUpdatedWatcher() {
@@ -129,13 +129,13 @@ private final DownloadEntry downloadEntry = new DownloadEntry("url","name");
     @Override
     protected void onResume() {
         super.onResume();
-        mDownloader.addObserver(mDataUpdateReceiver);
+        QuietDownloader.addObserver(mDataUpdateReceiver);
     }
     
     @Override
     protected void onPause() {
         super.onPause();
-        mDownloader.removeObserver(mDataUpdateReceiver);
+        QuietDownloader.removeObserver(mDataUpdateReceiver);
     }
     
 ```
@@ -199,6 +199,9 @@ public class DownloadEntry implements Serializable {
 ---
 
 ## 版本历史
+
+### v1.0.8-beta
+  - [fixBug](https://github.com/xwdz/QuietDownload/issues/8)
 
 
 ### v1.0.61-beta

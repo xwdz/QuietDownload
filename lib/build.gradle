@@ -39,15 +39,15 @@ dependencies {
     implementation 'com.j256.ormlite:ormlite-android:4.48'
 }
 
-def siteUrl = 'http://huangxingwei.cn'
+def siteUrl = 'http://xwcc.fun'
 publish {
     userOrg = 'quinnhuang'
     repoName = 'widget'
     groupId = 'com.xwdz'
     artifactId = 'QuietDownloader'
     publishVersion = '1.0.7'
-    desc = '下载器'//描述，不重要
-    website = siteUrl//项目主页
+    desc = '下载器'
+    website = siteUrl
 }
 tasks.withType(Javadoc) {//防止编码问题
     options.addStringOption('Xdoclint:none', '-quiet')

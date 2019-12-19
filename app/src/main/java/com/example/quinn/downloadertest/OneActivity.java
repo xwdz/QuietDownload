@@ -45,6 +45,9 @@ public class OneActivity extends AppCompatActivity {
         }
     };
 
+
+    long a = 1669615688;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

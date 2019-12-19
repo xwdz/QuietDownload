@@ -67,7 +67,7 @@ public class DownloadEntry implements Serializable, Cloneable {
     public void reset() {
         currentLength = 0;
         ranges = null;
-        File file = QuietDownloader.getConfigs().getDownloadFile(url);
+        File file = QuietDownloader.getConfigs().getDownloadFile(name);
         if (file.exists()) {
             file.delete();
         }

@@ -196,6 +196,10 @@ public class DownloadEntry implements Serializable {
  - [ ] 拦截器实现
 
  
+
+[![Stargazers](https://starchart.cc/xwdz/QuietDownload.svg)](https://starchart.cc/xwdz/QuietDownload)
+
+
 ---
 
 ## 版本历史
